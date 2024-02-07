@@ -1,0 +1,386 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zxx" class="no-js">
+
+<head>
+  <!-- Mobile Specific Meta -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <!-- Favicon-->
+  <link rel="shortcut icon" href="{% static 'img/fav.png' %}" />
+  <!-- Author Meta -->
+  <meta name="author" content="codepixer" />
+  <!-- Meta Description -->
+  <meta name="description" content />
+  <!-- Meta Keyword -->
+  <meta name="keywords" content />
+  <!-- meta character set -->
+  <meta charset="UTF-8" />
+  <!-- Site Title -->
+  <title>Book</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
+    integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e" crossorigin="anonymous" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,400,300,500,600,700" rel="stylesheet" />
+  <!-- CSS -->
+  <link rel="stylesheet" href="{% static 'css/linearicons.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/nice-select.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/animate.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/owl.carousel.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+</head>
+<style>
+  .custom-h1 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 250px;
+    margin-left: 30px;
+    color: black;
+  }
+
+  .image-container {
+    width: fit-content;
+    height: fit-content;
+  }
+
+  .image-container img {
+    width: 150px;
+    height: 280px;
+  }
+
+  /* CSS for the search container */
+  .search-container {
+    background-color: #ca3737;
+    /* Background color */
+    margin-top: 60px;
+    padding: 20px;
+    border-radius: 5px;
+    /* Rounded corners */
+    box-shadow: 0px 0px 10px rgba(10, 116, 49, 0.1);
+    /* Box shadow for depth */
+  }
+
+  /* CSS for the search input */
+  .search-input {
+    margin-top: 9px;
+    width: 500px;
+    /* Take up the entire width of the container */
+    padding: 10px;
+    border: none;
+    /* Remove border */
+    border-radius: 50px;
+    /* Rounded corners for the input */
+    font-size: 18px;
+    /* Font size */
+  }
+
+  /* Style for search results (customize as needed) */
+  #search-results {
+    margin-top: 20px;
+    /* Add margin to separate from search bar */
+    /* Add additional styling for search results here */
+  }
+
+  .search-container {
+    position: relative;
+  }
+
+  .bi-search {
+    position: absolute;
+    right: 550px;
+    /* Adjust this value to control the icon's position */
+    top: 55%;
+    transform: translateY(-50%);
+  }
+
+
+  .customSize {
+
+    font-size: 18px;
+    margin: 10px;
+  }
+
+  .customPosition {
+    position: absolute;
+    top: -10px;
+    right: 70px;
+    background-color: red;
+
+    border-radius: 40px;
+    font-size: 2px;
+  }
+
+  .customPosition1 {
+    position: absolute;
+    top: -10px;
+    right: 5px;
+    background-color: rgb(137, 137, 222);
+
+    border-radius: 40px;
+    font-size: 2px;
+  }
+</style>
+
+<body>
+  <header id="header" class="bg-dark" id="home">
+    <div class="container">
+      <div class="row align-items-center justify-content-between d-flex">
+        <div id="logo">
+          <a href="{% url 'index' %}"><img src="{% static 'img/logo.png' %}" height="30px" width="100px" alt title /></a>
+        </div>
+        <nav id="nav-menu-container">
+          <ul class="nav-menu">
+            <li class="menu-active"><a href="{% url 'index' %}">Home</a></li>
+            {% if user.is_authenticated %}
+            <li><a href="#about">About</a></li>
+            <li><a href="{% url 'libary_view' %}">library</a></li>
+            <li><a href="{% url 'order_history' %}">Order</a></li>
+            <li class="menu-has-children"><a href>Books</a>
+              <ul>
+                <li><a id="printcopy" href="{% url 'books_view' %}">Print Copy</a></li>
+                <li><a href="{% url 'audio_view' %}">Audiobook</a></li>
+                <li><a href="{% url 'pdf_view' %}">E-Books</a></li>
+              </ul>
+            </li>
+            {% endif %}
+            <li class="menu-has-children"><a href><i id="log-drop"
+                  class="bi bi-person-gear customSize mr-3"></i>{{user.first_name}}
+                {{user.last_name}}</a>
+              <ul>
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'profile' %}">profile</a></li>
+                <li><a href="{% url 'logout' %}">logout</a></li>
+                {% endif %}
+                {% if not user.is_authenticated %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'register' %}">Register Customer</a></li>
+                <li><a href="{% url 'seller' %}">Register Seller</a></li>
+                {% endif %}
+              </ul>
+            </li>
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'cart' %}"><i class="bi bi-cart3 customSize text-light fs-5 mr-5 "></i></a></li>
+            <li><a href="{% url 'wishlist' %}"><i class="bi bi-heart customSize text-light"></i></a>
+            </li>
+
+            <li><a class="customPosition1" href="{% url 'wishlist' %}">{{countw}}</a></li>
+            <li><a class="customPosition" href="{% url 'cart' %}">{{count}}</a></li>
+
+            {% endif %}
+          </ul>
+        </nav><!-- #nav-menu-container -->
+      </div>
+    </div>
+  </header><!-- #header -->
+
+  <!-- Search Bar -->
+  <div class="search-container d-flex">
+    <h1 class="text custom-h1">Audio books</h1>
+    <input type="text justify-content-center " id="search-input" class="search-input"
+      placeholder="Search book name..." /><i class="bi bi-search text-danger"></i>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    function showMoreCategories() {
+      // Show hidden categories
+      $("#categoryTabs li.d-none").removeClass("d-none");
+      // Hide the "More" button
+      $("#moreButton").addClass("d-none");
+    }
+  </script>
+
+  <div class="container mt-3">
+    <div id="search-results">
+      <!-- Search results will be dynamically inserted here -->
+    </div>
+  </div>
+
+  <!-- End Search Bar -->
+
+  <!-- End Search Bar -->
+
+  <div class="row toggle">
+    <div class="container mt-3 mb-4">
+      {% for i in audiobook %}
+      <div class="row">
+        <div class="col-md-12 mt-2">
+          <div class="card d-flex flex-row">
+            <div class="p-3 image-container">
+              <img src="{{ i.cover_image.url }}" class="card-img-top pt-4" alt="Book Cover" />
+            </div>
+            <div class="card-body d-flex flex-row align-items-center">
+              <div class="left">
+                <h3 class="card-title">{{ i.title }}</h3>
+                <p class="card-text">
+                  <strong>Author:</strong>{{ i.author }}
+                </p>
+                <p class="card-text">
+                  <strong>Duration:</strong>{{ i.duration }} minutes
+                </p>
+                <p class="card-text">
+                  <strong>Narrator:</strong>{{ i.narrator }}
+                </p>
+                <p class="card-text">
+                  <strong>Publication Date:</strong>{{ i.publication_date }}
+                </p>
+              </div>
+              <div class="right d-flex flex-column w-75 ml-5">
+                <a href="{{ i.audio_file.url }}" download class="btn btn-outline-info btn-lg"><i
+                    class="bi bi-file-music-fill ml-5"></i> Download
+                  Audiobook</a>
+                <a href="{% url 'add_audiotolibrary' i.id %}" class="btn btn-outline-success mt-3 btn-lg"><i class="bi bi-folder-plus"></i> Add to Library</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- search ajax -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $("#search-input").on("keyup", function () {
+        var query = $(this).val();
+
+        $.ajax({
+          type: "GET",
+          url: "{% url 'live_search_audio' %}", // Update with your Django view URL
+          data: {
+            query: query,
+          },
+          success: function (data) {
+            // Clear previous search results
+            $("#search-results").empty();
+
+            // Loop through the book data and create HTML elements
+            for (var i = 0; i < data.bookdata.length; i++) {
+              var book = data.bookdata[i];
+              console.log(book);
+              var bookHtml = `
+                <div class="row ">
+                    <div class="container mt-4 mb-4">
+                        <div class="row">
+                            <div class="col-md-12 mt-2">
+                                <div class="card d-flex flex-row">
+                                    <div class="p-3 image-container">
+                                        <img src="${book.cover_image}" class="card-img-top pt-3" alt="Book Cover" />
+                                    </div>
+                                        <div class="card-body d-flex flex-row align-items-center">
+                                            <div class="left">
+                                                <h3 class="card-title">${book.title}</h3>
+                                                <p class="card-text"><strong>Author:</strong>${book.author}</p>
+                                                <p class="card-text"><strong>Duration:</strong>${book.duration} minutes</p>
+                                                <p class="card-text"><strong>Narrator:</strong>${book.narrator}</p>
+                                                <p class="card-text"><strong>Publication Date:</strong>${book.publication_date}</p>
+                                            </div>
+                                            <div class="right d-flex flex-column w-75 ml-5">
+                                                <a href="${book.audio_file}" download class="btn btn-outline-info btn-lg w-100"><i class="bi bi-file-music-fill ml-5"></i> Download Audiobook</a>
+                                                <a href="{% url 'add_audiotolibrary' 55 %}" class="btn btn-outline-success mt-3 btn-lg"><i class="bi bi-bookmarks"></i> Go to favorites</a>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+
+                      `.replace("55", book.id);
+              $("#search-results").append(bookHtml);
+              $(".toggle").hide();
+            }
+          },
+        });
+      });
+    });
+  </script>
+
+  <!-- start footer Area -->
+  <footer class="footer-area section-gap">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-5 col-md-6 col-sm-6">
+          <div class="single-footer-widget">
+            <h6>About Us</h6>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+              eiusmod tempor incididunt ut labore dolore magna aliqua.
+            </p>
+            <p class="footer-text">
+              <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+              Copyright &copy;
+              <script>
+                document.write(new Date().getFullYear());
+              </script>
+              All rights reserved | This template is made with
+              <i class="fa fa-heart-o" aria-hidden="true"></i>
+              by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+              <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+            </p>
+          </div>
+        </div>
+        <div class="col-lg-5 col-md-6 col-sm-6">
+          <div class="single-footer-widget">
+            <h6>Newsletter</h6>
+            <p>Stay update with our latest</p>
+            <div class id="mc_embed_signup">
+              <form target="_blank" novalidate="true"
+                action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01"
+                method="get" class="form-inline">
+                <input class="form-control" name="EMAIL" placeholder="Enter Email" onfocus="this.placeholder = ''"
+                  onblur="this.placeholder = 'Enter Email '" required type="email" />
+                <button class="click-btn btn btn-default">
+                  <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                </button>
+                <div style="position: absolute; left: -5000px">
+                  <input name="b_36c4fd991d266f23781ded980_aefe40901a" tabindex="-1" value type="text" />
+                </div>
+                <div class="info"></div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-6 col-sm-6 social-widget">
+          <div class="single-footer-widget">
+            <h6>Follow Us</h6>
+            <p>Let us be social</p>
+            <div class="footer-social d-flex align-items-center">
+              <a href="#"><i class="fa fa-facebook"></i></a>
+              <a href="#"><i class="fa fa-twitter"></i></a>
+              <a href="#"><i class="fa fa-dribbble"></i></a>
+              <a href="#"><i class="fa fa-behance"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <!-- End footer Area -->
+  <script src="{% static 'js/vendor/jquery-2.2.4.min.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="{% static 'js/vendor/bootstrap.min.js' %}"></script>
+  <script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhOdIF3Y9382fqJYt5I_sswSrEw5eihAA"></script>
+  <script src="{% static 'js/easing.min.js' %}"></script>
+  <script src="{% static 'js/hoverIntent.js' %}"></script>
+  <script src="{% static 'js/superfish.min.js' %}"></script>
+  <script src="{% static 'js/jquery.ajaxchimp.min.js' %}"></script>
+  <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+  <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+  <script src="{% static 'js/jquery.sticky.js' %}"></script>
+  <script src="{% static 'js/jquery.nice-select.min.js' %}"></script>
+  <script src="{% static 'js/parallax.min.js' %}"></script>
+  <script src="{% static 'js/waypoints.min.js' %}"></script>
+  <script src="{% static 'js/jquery.counterup.min.js' %}"></script>
+  <script src="{% static 'js/mail-script.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+</body>
+
+</html>

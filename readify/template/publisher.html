@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>library- Bookstore</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .custom-sidebar{
+            height: 750px;
+        }
+        .image-container {
+            width: fit-content;
+            height: fit-content;
+        }
+    
+        .image-container img {
+            width: 180px;
+            height: 280px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar bg-secondary custom-sidebar">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active text-light" href="" id="dashboard-link">
+                                <h2>Publisher</h2>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-light" href="" id="books-link">
+                                Ordered Books
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-light" href="" id="fav-link">
+                                Favorites
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <h1 class="mt-2">Readify</h1>
+                <!-- Dashboard Content -->
+                <div class="my-4" id="dashboard-content">
+                    <!-- Display Dashboard content here -->
+                </div>
+
+                <!-- Add Book Form -->
+                <div class="my-4" id="books-content" style="display: none;">
+                    <h2>Add Book</h2>
+                    <!-- Your add book form code goes here -->
+                </div>
+
+                <div class="my-4" id="fav-content" style="display: none;">
+                    <h2>Audiobook</h2>
+
+                    
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $("#dashboard-link").click(function () {
+                $("#dashboard-content").show();
+                $("#books-content").hide();
+                $("#fav-content").hide();
+            });
+
+            $("#books-link").click(function () {
+                $("#dashboard-content").hide();
+                $("#books-content").show();
+                $("#fav-content").hide();
+            });
+
+            $("#fav-link").click(function () {
+                $("#dashboard-content").hide();
+                $("#books-content").hide();
+                $("#fav-content").show();
+            });
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <!-- Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
+    
+</body>
+</html>

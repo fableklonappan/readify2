@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  .image-container {
+    width: fit-content;
+    height: fit-content;
+  }
+
+  .image-container img {
+    width: 150px;
+    height: 280px;
+  }
+
+  /* .customSize {
+
+    font-size: 18px;
+    margin: 10px;
+  }
+
+  .customPosition {
+    position: absolute;
+    top: -10px;
+    right: 70px;
+    background-color: red;
+
+    border-radius: 40px;
+    font-size: 2px;
+  }
+
+  .customPosition1 {
+    position: absolute;
+    top: -10px;
+    right: 5px;
+    background-color: rgb(137, 137, 222);
+
+    border-radius: 40px;
+    font-size: 2px;
+  } */
+
+  /* CSS for the search container */
+  .search-container {
+    background-color: #ca3737;
+    /* Background color */
+    margin-top: 60px;
+    padding: 20px;
+    border-radius: 5px;
+    /* Rounded corners */
+    box-shadow: 0px 0px 10px rgba(10, 116, 49, 0.1);
+    /* Box shadow for depth */
+  }
+
+  /* CSS for the search input */
+  .search-input {
+    margin-top: 9px;
+    width: 500px;
+    /* Take up the entire width of the container */
+    padding: 10px;
+    border: none;
+    /* Remove border */
+    border-radius: 50px;
+    /* Rounded corners for the input */
+    font-size: 18px;
+    /* Font size */
+  }
+
+  /* Style for search results (customize as needed) */
+  #search-results {
+    margin-top: 20px;
+    /* Add margin to separate from search bar */
+    /* Add additional styling for search results here */
+  }
+
+  .stock-count {
+    position: absolute;
+    top: 48px;
+
+    left: 0;
+    padding: 5px;
+    /* Optional: Add some padding to the stock count for better visibility */
+    background-color: rgba(10, 10, 10, 0.933);
+    /* Optional: Add a background color for better readability */
+    color: white;
+    /* Optional: Set the text color to white for better readability on the background */
+  }
+
+  .search-container {
+    position: relative;
+  }
+
+  .bi-search {
+    position: absolute;
+    right: 550px;
+    /* Adjust this value to control the icon's position */
+    top: 55%;
+    transform: translateY(-50%);
+  }
+
+
+
+  .nav-link:hover {
+    background-color: #ca3737;
+    color: #e1e6ec;
+  }
+
+  .nav-link.active {
+    background-color: #17bf9d;
+    color: #fff;
+  }
+
+  .more-link:hover {
+    text-decoration: underline;
+    /* Underline on hover for "More" link */
+  }
+</style>
+
+<body>
+
+  <!-- Search Bar -->
+  <div class="search-container d-flex justify-content-center align-items-center">
+    <input type="text" id="search-input" class="search-input" placeholder="Search..." /><i
+      class="bi bi-search text-danger  "></i>
+
+  </div>
+  <!-- Category Tabs -->
+
+  <div class="container text-center mt-4 bg-dark">
+    <ul class="nav nav-tabs" id="categoryTabs">
+      <li class="nav-item" id="moreButton">
+        <a class="nav-link more-link text-white" href="#" onclick="showMoreCategories()"><i
+            class="bi bi-list text-decoration-none text-white"></i></a>
+      </li>
+      {% for category in categories %}
+      <li class="nav-item{% if forloop.counter > 11 %} d-none{% endif %}">
+
+        <a class="nav-link text-decoration-none text-white" href="/libraryapp/books_view/{{ category.name }}"
+          data-category="{{ category.name }}">{{ category.name }}</a>
+      </li>
+      {% endfor %}
+
+    </ul>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    function showMoreCategories() {
+      // Show hidden categories
+      $('#categoryTabs li.d-none').removeClass('d-none');
+      // Hide the "More" button
+      $('#moreButton').addClass('d-none');
+    }
+  </script>
+
+
+
+  <div class="container mt-3">
+    <div class="row" id="search-results">
+      <!-- Search results will be dynamically inserted here -->
+    </div>
+  </div>
+
+  <!-- End Search Bar -->
+
+  <!-- cards-->
+  <div class="mt-90 toggle">
+
+    {% csrf_token %}
+    {% for data in bookdata %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-danger text-center">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    <div class="container mt-1">
+      <div class="row">
+        <div class="col-md-12 mb-2">
+          <div class="card d-flex flex-row">
+            <div class="p-3 image-container">
+              <div class="image-onBoard position-relative">
+                <img src="{{data.picture.url}}" class="card-img-top pt-5" alt="Book Cover" />
+                <span class="position-absolute stock-count top-left">{{data.stock}}</span>
+              </div>
+              <h4 class="text-success mt-2 ml-2">Price: ₹{{data.price}}</h4>
+            </div>
+
+            <div class="card-body">
+              <h2 class="card-title text-primary">{{data.title}}</h2>
+              <p class="card-text"><strong>{{data.author_name}}</strong></p>
+              <p class="card-text text-italic">
+                <strong>{{data.publisher}}</strong>
+              </p>
+              <p class="card-text">{{data.summary}}</p>
+              <a href="{% url 'add_cart' data.id %}"><button class="btn btn-outline-info w-25 ml-50 mt-10">
+                  <i class="bi bi-cart-plus pr-3"></i>Add to Cart
+                </button></a>
+              <a href="{% url 'add_wishlist' data.id %}"><button class="btn btn-outline-danger ml-50 w-25 mt-10">
+                  <i class="bi bi-suit-heart-fill pr-3"></i>Add to Wishlist
+                </button></a>
+              <a href="{% url 'rent' data.id %}"><button class="btn btn-outline-secondary ml-50 w-25 mt-10">
+                  <i class="bi bi-book pr-3"></i>Rent the book
+                </button></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- cards-->
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $("#search-input").on("keyup", function () {
+        var query = $(this).val();
+
+        $.ajax({
+          type: "GET",
+          url: "{% url 'live_search_books' %}", // Update with your Django view URL
+          data: {
+            query: query,
+          },
+          success: function (data) {
+            // Clear previous search results
+            $("#search-results").empty();
+
+            // Loop through the book data and create HTML elements
+            for (var i = 0; i < data.bookdata.length; i++) {
+              var book = data.bookdata[i];
+              console.log(book);
+              var bookHtml = `
+                    <div class="col-md-12 mb-2">
+                      <div class="card d-flex flex-row">
+                        <!-- Include your book data here -->
+                        <div class="p-3 image-container">
+                          <img src="${book.picture_url}" class="card-img-top pt-5" alt="Book Cover" />
+                          <h4 class="text-success mt-2 ml-2">Price: $${book.price}</h4>
+                        </div>
+                        <div class="card-body">
+                          <h2 class="card-title text-primary">${book.title}</h2>
+                          <p class="card-text"><strong>${book.author_name}</strong></p>
+                          <p class="card-text text-italic"><strong>${book.publisher}</strong></p>
+                          <p class="card-text">${book.summary}</p>
+                          <a href="{% url 'add_cart' 55 %}"> <!-- Add your book detail URL here --> 
+                            <button class="btn btn-outline-info w-25 ml-50 mt-10">
+                              <i class="bi bi-cart-plus pr-3"></i>Add to Cart
+                            </button>
+                          </a>
+                          <a href="{% url 'add_wishlist' 56 %}"> <!-- Add your book detail URL here -->
+                            <button class="btn btn-outline-danger ml-50 w-25 mt-10">
+                              <i class="bi bi-suit-heart-fill pr-3"></i>Add to Wishlist
+                            </button>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  `.replace("55", book.id).replace("56", book.id);
+              $("#search-results").append(bookHtml);
+              $(".toggle").hide();
+            }
+          },
+        });
+      });
+    });
+  </script>
+
+
+  {% endblock content %}
+</body>
+
+</html>

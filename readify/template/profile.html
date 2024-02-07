@@ -1,0 +1,329 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zxx" class="no-js">
+
+<head>
+  <!-- Mobile Specific Meta -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Favicon-->
+  <link rel="shortcut icon" href="{% static 'img/fav.png' %}">
+  <!-- Author Meta -->
+  <meta name="author" content="codepixer">
+  <!-- Meta Description -->
+  <meta name="description" content>
+  <!-- Meta Keyword -->
+  <meta name="keywords" content>
+  <!-- meta character set -->
+  <meta charset="UTF-8">
+  <!-- Site Title -->
+  <title>Book</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,400,300,500,600,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
+    integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e" crossorigin="anonymous">
+  <!--
+        CSS
+        ============================================= -->
+  <link rel="stylesheet" href="{% static 'css/linearicons.css' %}">
+  <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+  <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
+  <link rel="stylesheet" href="{% static 'css/nice-select.css' %}">
+  <link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/owl.carousel.css' %}">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<style>
+  body {
+    background-image: url('{% static "" %}');
+    background-size: cover;
+    background-position: center;
+    height: 50%;
+    background-repeat: no-repeat;
+  }
+
+  .emp-profile {
+    padding: 1%;
+    margin-top: 3%;
+    border-radius: 0.5rem;
+    opacity: 90%;
+    background: #fff;
+  }
+
+  .customSize {
+
+    font-size: 18px;
+  }
+
+  .customPosition {
+    position: absolute;
+    top: -10px;
+    right: 60px;
+    background-color: red;
+
+    border-radius: 50px;
+    font-size: 5px;
+  }
+
+  .customPosition1 {
+    position: absolute;
+    top: -10px;
+    right: 5px;
+    background-color: blue;
+
+    border-radius: 50px;
+    font-size: 5px;
+  }
+</style>
+</head>
+
+<body>
+  <header id="header" class="bg-dark" id="home">
+    <div class="container">
+      <div class="row align-items-center justify-content-between d-flex">
+        <div id="logo">
+          <a href="{% url 'index' %}"><img src="{% static 'img/logo.png' %}" height="30px" width="100px" alt title /></a>
+        </div>
+        <nav id="nav-menu-container">
+
+          <ul class="nav-menu">
+            <li class="menu-active"><a href="{% url 'index' %}">Home</a></li>
+            {% if user.is_authenticated %}
+            <li><a class="text-black" href="#about">About</a></li>
+            <li><a href="#fact">Fact</a></li>
+            <li><a href="#price">Price</a></li>
+            <li class="menu-has-children"><a href>Books</a>
+              <ul>
+                <li><a href="{% url 'books_view' %}">Print Copy</a></li>
+                <li><a href="{% url 'audio_view' %}">Audiobook</a></li>
+                <li><a href="">E-Books</a></li>
+              </ul>
+            </li>
+            {% endif %}
+            <li class="menu-has-children"><a href>My Account</a>
+              <ul>
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'profile' %}">profile</a></li>
+                <li><a href="{% url 'logout' %}">logout</a></li>
+                {% endif %}
+                {% if not user.is_authenticated %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'register' %}">Register Customer</a></li>
+                <li><a href="{% url 'seller' %}">Register Seller</a></li>
+                {% endif %}
+              </ul>
+            </li>
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'cart' %}"><i class="bi bi-cart customSize text-primary ml-3 "></i></a></li>
+            <li><a href="{% url 'wishlist' %}"><i class="bi bi-heart-fill customSize text-danger ml-3 "></i></a></li>
+
+            <li><a class="customPosition1" href="{% url 'wishlist' %}">{{countw}}</a></li>
+            <li><a class="customPosition" href="{% url 'cart' %}">{{count}}</a></li>
+
+
+            {% endif %}
+          </ul>
+        </nav><!-- #nav-menu-container -->
+      </div>
+    </div>
+  </header><!-- #header -->
+  <div class="container emp-profile mb-3">
+    <form method="POST" enctype="multipart/form-data" class="mb-5">
+      {% csrf_token %}
+      <section class="gray pt-5 pb-1">
+        <div class="container-fluid">
+
+          <div class="row justify-content-center">
+
+            <div class="col-lg-9 col-md-8">
+              <div class="dashboard-body">
+
+                <div class="dashboard-wraper">
+                  <div class="row">
+
+                    <div class="col-lg-12 col-md-12">
+                      <div class="submit-page px-0">
+
+                        <!-- Basic Information -->
+                        <div class="frm_submit_block  mb-5">
+                          <div class="frm_submit_wrap">
+                            <div class="row">
+                              <div class="form-group col-md-6 pd-20">
+                                <label class="mt-2 mb-1">First Name</label>
+                                <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}" required>
+                              </div>
+                              <div class="form-group col-md-6 pd-20">
+                                <label class="mt-2 mb-1">Last Name</label>
+                                <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}" required>
+                              </div>
+                              <div class="form-group col-md-6 pd-20">
+                                <label class="mt-2 mb-1">Email</label>
+                                <input type="text" name="email" class="form-control" value="{{ user.email }}" disabled>
+                              </div>
+
+                              <div class="form-group col-md-6 pd-20">
+                                <label class="mt-2 mb-1">Phone Number</label>
+                                <input type="text" name="phone_no" class="form-control"
+                                  value="{{ user_profile.phone_no }}">
+                              </div>
+
+                              <div class="form-group col-md-6 pd-20">
+                                <label class="mt-2 mb-1">Address Line 1</label>
+                                <input type="text" name="addressline1" class="form-control"
+                                  value="{{ user_profile.addressline1 }}">
+                              </div>
+                              <div class="form-group col-md-6 pd-20">
+                                <label class="mt-2 mb-1">Address Line 2</label>
+                                <input type="text" name="addressline2" class="form-control"
+                                  value="{{ user_profile.addressline2 }}">
+                              </div>
+                              <div class="form-group col-md-6 pd-20">
+                                <label class="mt-2 mb-1">City</label>
+                                <input type="text" name="city" class="form-control" value="{{ user_profile.city }}">
+                              </div>
+                              <div class="form-group col-md-6 pd-20">
+                                <label class="mt-2 mb-1">District</label>
+                                <input type="text" name="district" class="form-control"
+                                  value="{{ user_profile.district }}">
+                              </div>
+
+                              <div class="form-group col-md-6 pd-20">
+                                <label class="mt-2 mb-1">State</label>
+                                <input type="text" name="state" class="form-control" value="{{ user_profile.state }}">
+                              </div>
+                              <div class="form-group col-md-6 pd-20">
+                                <label class="mt-2 mb-1">country</label>
+                                <input type="text" name="country" class="form-control"
+                                  value="{{ user_profile.country }}">
+                              </div>
+                              <div class="form-group col-md-6 pd-20">
+                                <label class="mt-2 mb-1">pin_code</label>
+                                <input type="text" name="pin_code" class="form-control"
+                                  value="{{ user_profile.pin_code }}">
+                              </div>
+                              <!-- More form fields... -->
+
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group col-lg-12 col-md-12 text-center">
+                          <button class="btn btn-success w-100" type="submit">Update</button>
+                        </div>
+
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+                <!-- row -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+    </form>
+  </div>
+
+
+  <!-- start footer Area -->
+  <footer class="footer-area section-gap">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-5 col-md-6 col-sm-6">
+          <div class="single-footer-widget">
+            <h6>About Us</h6>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur
+              adipisicing elit, sed do eiusmod tempor
+              incididunt ut labore dolore magna aliqua.
+            </p>
+            <p class="footer-text">
+              <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+              Copyright &copy;
+              <script>document.write(new Date().getFullYear());</script>
+              All rights reserved | This template is made with
+              <i class="fa fa-heart-o" aria-hidden="true"></i>
+              by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+              <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+            </p>
+          </div>
+        </div>
+        <div class="col-lg-5  col-md-6 col-sm-6">
+          <div class="single-footer-widget">
+            <h6>Newsletter</h6>
+            <p>Stay update with our latest</p>
+            <div class id="mc_embed_signup">
+              <form target="_blank" novalidate="true"
+                action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01"
+                method="get" class="form-inline">
+                <input class="form-control" name="EMAIL" placeholder="Enter Email" onfocus="this.placeholder = ''"
+                  onblur="this.placeholder = 'Enter Email '" required type="email">
+                <button class="click-btn btn btn-default"><i class="fa fa-long-arrow-right"
+                    aria-hidden="true"></i></button>
+                <div style="position: absolute; left: -5000px;">
+                  <input name="b_36c4fd991d266f23781ded980_aefe40901a" tabindex="-1" value type="text">
+                </div>
+
+                <div class="info"></div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-6 col-sm-6 social-widget">
+          <div class="single-footer-widget">
+            <h6>Follow Us</h6>
+            <p>Let us be social</p>
+            <div class="footer-social d-flex align-items-center">
+              <a href="#"><i class="fa fa-facebook"></i></a>
+              <a href="#"><i class="fa fa-twitter"></i></a>
+              <a href="#"><i class="fa fa-dribbble"></i></a>
+              <a href="#"><i class="fa fa-behance"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <!-- End footer Area -->
+
+
+  <script src="{% static 'js/vendor/jquery-2.2.4.min.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="{% static 'js/vendor/bootstrap.min.js' %}"></script>
+  <script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhOdIF3Y9382fqJYt5I_sswSrEw5eihAA"></script>
+  <script src="{% static 'js/easing.min.js' %}"></script>
+  <script src="{% static 'js/hoverIntent.js' %}"></script>
+  <script src="{% static 'js/superfish.min.js' %}"></script>
+  <script src="{% static 'js/jquery.ajaxchimp.min.js' %}"></script>
+  <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+  <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+  <script src="{% static 'js/jquery.sticky.js' %}"></script>
+  <script src="{% static 'js/jquery.nice-select.min.js' %}"></script>
+  <script src="{% static 'js/parallax.min.js' %}"></script>
+  <script src="{% static 'js/waypoints.min.js' %}"></script>
+  <script src="{% static 'js/jquery.counterup.min.js' %}"></script>
+  <script src="{% static 'js/mail-script.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+    integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+    integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+
+
+
+
+</body>
+
+</html>

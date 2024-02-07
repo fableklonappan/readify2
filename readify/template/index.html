@@ -1,0 +1,634 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zxx" class="no-js">
+
+<head>
+    <!-- Mobile Specific Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Favicon-->
+    <link rel="shortcut icon" href="{% static 'img/fav.png' %}">
+    <!-- Author Meta -->
+    <meta name="author" content="codepixer">
+    <!-- Meta Description -->
+    <meta name="description" content>
+    <!-- Meta Keyword -->
+    <meta name="keywords" content>
+    <!-- meta character set -->
+    <meta charset="UTF-8">
+    <!-- Site Title -->
+    <title>Book</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,400,300,500,600,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
+        integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e" crossorigin="anonymous">
+    <!--
+        CSS
+        ============================================= -->
+    <link rel="stylesheet" href="{% static 'css/linearicons.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
+    <link rel="stylesheet" href="{% static 'css/nice-select.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/owl.carousel.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<style>
+    .customSize {
+
+        font-size: 18px;
+        margin: 10px;
+    }
+
+    .customPosition {
+        position: absolute;
+        top: -10px;
+        right: 70px;
+        background-color: red;
+
+        border-radius: 40px;
+        font-size: 2px;
+    }
+
+    .customPosition1 {
+        position: absolute;
+        top: -10px;
+        right: 5px;
+        background-color: rgb(137, 137, 222);
+
+        border-radius: 40px;
+        font-size: 2px;
+    }
+
+</style>
+
+<body>
+    <script type="text/javascript">
+        (function(d, m){
+            var kommunicateSettings = 
+                {"appId":"2553952e9928000c42e25be576f63581b","popupWidget":true,"automaticChatOpenOnNavigation":true};
+            var s = document.createElement("script"); s.type = "text/javascript"; s.async = true;
+            s.src = "https://widget.kommunicate.io/v2/kommunicate.app";
+            var h = document.getElementsByTagName("head")[0]; h.appendChild(s);
+            window.kommunicate = m; m._globals = kommunicateSettings;
+        })(document, window.kommunicate || {});
+    /* NOTE : Use web server to view HTML files as real-time update will not work if you directly open the HTML file in the browser. */
+    </script>
+    <header id="header" class="" id="home">
+        <div class="container">
+            <div class="row align-items-center justify-content-between d-flex">
+                <div id="logo" class="ml-5">
+                    <a href="index.html"><img src="{% static 'img/logo.png' %}" height="30px" width="100px" alt title /></a>
+                </div>
+                <nav id="nav-menu-container">
+                    <ul class="nav-menu">
+                        <li class="menu-active"><a href="{% url 'index' %}">Home</a></li>
+                        {% if user.is_authenticated %}
+                        <li><a href="#about">About</a></li>
+                        <li><a href="{% url 'libary_view' %}">library</a></li>
+                        <li><a href="{% url 'order_history' %}">Order</a></li>
+                        <li class="menu-has-children"><a href>Books</a>
+                            <ul>
+                                <li><a id="printcopy" href="{% url 'books_view' %}">Print Copy</a></li>
+                                <li><a href="{% url 'audio_view' %}">Audiobook</a></li>
+                                <li><a href="{% url 'pdf_view' %}">E-Books</a></li>
+                            </ul>
+                        </li>
+                        {% endif %}
+                        <li class="menu-has-children"><a href><i id="log-drop" class="bi bi-person-gear customSize mr-3"></i>{{user.first_name}}
+                                {{user.last_name}}</a>
+                            <ul>
+                                {% if user.is_authenticated %}
+                                <li><a href="{% url 'profile' %}">profile</a></li>
+                                <li><a href="{% url 'logout' %}">logout</a></li>
+                                {% endif %}
+                                {% if not user.is_authenticated %}
+                                <li><a href="{% url 'login' %}">Login</a></li>
+                                <li><a href="{% url 'register' %}">Register Customer</a></li>
+                                <li><a href="{% url 'seller' %}">Register Seller</a></li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'cart' %}"><i
+                                    class="bi bi-cart3 customSize text-light fs-5 mr-5 "></i></a></li>
+                        <li><a href="{% url 'wishlist' %}"><i class="bi bi-heart customSize text-light"></i></a>
+                        </li>
+
+                        <li><a class="customPosition1" href="{% url 'wishlist' %}">{{countw}}</a></li>
+                        <li><a class="customPosition" href="{% url 'cart' %}">{{count}}</a></li>
+
+                        {% endif %}
+                    </ul>
+                </nav><!-- #nav-menu-container -->
+            </div>
+        </div>
+    </header><!-- #header -->
+
+
+    <!-- start banner Area -->
+    <section class="banner-area" id="home">
+        <div class="container">
+            <div class="row fullscreen d-flex align-items-center justify-content-start">
+                <div class="banner-content col-lg-7">
+                    <h5 class="text-white text-uppercase">Welcome {{user.first_name}} {{user.last_name}}</h5>
+                    <h1 class="text-uppercase">
+                        New Adventure
+                    </h1>
+                    <p class="text-white pt-20 pb-20">
+                        Embark on a literary journey with Readify, where every page turns into an adventure, 
+                        and every story becomes a cherished companion. Uncover the magic of words, explore 
+                        captivating narratives,and let the shelves of our online book haven transport you to
+                         worlds yet undiscovered. Discover, indulge, and reimagine your reading experience
+                         with Readify—the doorway to a universe of boundless stories awaits at your fingertips!
+                    </p>
+                    <a href="#" class="primary-btn text-uppercase">Start for ₹ 9.99</a>
+                </div>
+                <div class="col-lg-5 banner-right">
+                    <img class="img-fluid" src="{% static 'img/header-img.png' %}" alt>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End banner Area -->
+
+    <!-- Start about Area -->
+    <section class="section-gap info-area" id="about">
+        <div class="container">
+            <div class="single-info row mt-40 align-items-center">
+                <div class="col-lg-6 col-md-12 text-center no-padding info-left">
+                    <div class="info-thumb">
+                        <img src="{% static 'img/about-img.jpg' %}" class="img-fluid info-img" alt>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 no-padding info-rigth">
+                    <div class="info-content">
+                        <h2 class="pb-30">Hello {{user.first_name}} ,</h2>
+                        <p>
+                            Welcome to Readify, your digital sanctuary for the love of books.
+                             Dive into a world of endless possibilities as you explore our carefully curated collection of captivating reads.
+                              From timeless classics to contemporary gems,
+                        <br>
+                        <p>
+                            Readify is your go-to online book haven. 
+                              Browse, choose, and let the magic of literature unfold in the comfort of your own space.
+                             Happy reading, and thank you for making Readify your preferred destination for literary adventures!
+                        </p>
+                        <br>
+                        <img src="{% static 'img/signature.png' %}" alt>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End about Area -->
+
+    <!-- Start fact Area -->
+    <section class="fact-area relative section-gap" id="fact">
+        <div class="overlay overlay-bg"></div>
+        <div class="container">
+            <div class="row d-flex justify-content-center">
+                <div class="menu-content pb-40 col-lg-8">
+                    <div class="title text-center">
+                        <h1 class="mb-10">Some Features that Made us Unique</h1>
+                        <p>Who are in extremely love with eco friendly
+                            system.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End fact Area -->
+
+    <!-- Start counter Area -->
+    <section class="counter-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <div class="single-counter">
+                        <h1 class="counter">253</h1>
+                        <p>Happy Clients</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="single-counter">
+                        <h1 class="counter">674</h1>
+                        <p>Total books</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="single-counter">
+                        <h1 class="counter">109</h1>
+                        <p>Total Audio books</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="single-counter">
+                        <h1 class="counter">139</h1>
+                        <p>Total E-books</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- end counter Area -->
+
+    <!-- Start price Area -->
+    <section class="price-area section-gap" id="price">
+        <div class="container">
+            <div class="row d-flex justify-content-center">
+                <div class="menu-content pb-60 col-lg-8">
+                    <div class="title text-center">
+                        <h1 class="mb-10">Purchase whatever you want</h1>
+                        <p>Who are in extremely love with eco friendly
+                            system.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="single-price no-padding">
+                        <div class="price-top">
+                            <h4>Audio Books</h4>
+                        </div>
+                        <p>
+                            Who are in extremely love with <br>
+                            Audio books.
+                        </p>
+                        <div class="price-bottom">
+                            <h1><span>₹</span> 79.99</h1>
+                            <a href="{% url 'audio_view' %}" class="primary-btn header-btn">Starting Now</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="single-price no-padding">
+                        <div class="price-top">
+                            <h4>E-Book</h4>
+                        </div>
+                        <p>
+                            Who are in extremely love with <br>
+                            documents.
+                        </p>
+                        <div class="price-bottom">
+                            <h1><span>₹</span> 29.99</h1>
+                            <a href="#" class="primary-btn header-btn">Starting Now</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="single-price no-padding">
+                        <div class="price-top">
+                            <h4>Print Copy</h4>
+                        </div>
+                        <p>
+                            Who are in extremely love with <br>
+                            books
+                        </p>
+                        <div class="price-bottom">
+                            <h1><span>₹</span> 39.99</h1>
+                            <a href="{% url 'books_view' %}" class="primary-btn">Starting Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End price Area -->
+
+    <!-- Start course Area -->
+    <section class="course-area section-gap" id="course">
+        <div class="container">
+            <div class="row d-flex justify-content-center">
+                <div class="menu-content pb-60 col-lg-9">
+                    <div class="title text-center">
+                        <h1 class="mb-10">Top Books That are open for
+                            {{user.first_name}}</h1>
+                        <p>Who are in extremely love with  Tales</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="active-course-carusel">
+                    <div class="single-course item">
+                        <img class="img-fluid" src="{% static 'img/c1.jpg' %}" alt>
+                        <p class="sale-btn">For Sale</p>
+                        <div class="details">
+                            <a href="#">
+                                <h4>Breakthrough Thinking <span class="price float-right">$25</span></h4>
+                            </a>
+                            <p>
+                                Welcome to Readify, where books are more than pages—they're passports to chic escapes and stylish adventures. 
+                                Unleash the power of literature in your hands, turning every read into a statement of sophistication. Elevate your shelves, 
+                                redefine your style,
+                                 and join us at Readify for a journey where books meet fashion in the world of words.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="single-course item">
+                        <img class="img-fluid" src="{% static 'img/c2.jpg' %}" alt>
+                        <p class="sale-btn">For Sale</p>
+                        <div class="details">
+                            <a href="#">
+                                <h4>Montages Toujours! <span class="price float-right">$25</span></h4>
+                            </a>
+                            <p>
+                                Welcome to Readify, where books are more than pages—they're passports to chic escapes and stylish adventures. 
+                                Unleash the power of literature in your hands, turning every read into a statement of sophistication. Elevate your shelves, 
+                                redefine your style,
+                                 and join us at Readify for a journey where books meet fashion in the world of words.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="single-course item">
+                        <img class="img-fluid" src="{% static 'img/c3.jpg' %}" alt>
+                        <p class="sale-btn">For Sale</p>
+                        <div class="details">
+                            <a href="#">
+                                <h4> Thinking <span class="price float-right">$25</span></h4>
+                            </a>
+                            <p>
+                                Welcome to Readify, where books are more than pages—they're passports to chic escapes and stylish adventures. 
+                                Unleash the power of literature in your hands, turning every read into a statement of sophistication. Elevate your shelves, 
+                                redefine your style,
+                                 and join us at Readify for a journey where books meet fashion in the world of words.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End course Area -->
+
+    <!-- Start call-to-action Area -->
+    <section class="call-to-action-area section-gap">
+        <div class="container">
+            <div class="row justify-content-center top">
+                <div class="col-lg-12">
+                    <h1 class="text-white text-center">Download Our App for
+                        all Platforms</h1>
+                    <p class="text-white text-center mt-30">
+                        It won’t be a bigger problem to find one book reader
+                        lover in your neighbor. Since the introduction of
+                        Virtual library, it has been achieving great heights so
+                        far as its popularity and technological advancement
+                        are concerned.
+                    </p>
+                </div>
+            </div>
+            <div class="row justify-content-center d-flex">
+                <div class="download-button d-flex flex-row justify-content-center mt-30">
+                    <div class="buttons flex-row d-flex">
+                        <i class="fa fa-apple" aria-hidden="true"></i>
+                        <div class="desc">
+                            <a href="#">
+                                <p>
+                                    <span>Available</span> <br>
+                                    on App Store
+                                </p>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="buttons flex-row d-flex">
+                        <i class="fa fa-android" aria-hidden="true"></i>
+                        <div class="desc">
+                            <a href="#">
+                                <p>
+                                    <span>Available</span> <br>
+                                    on Play Store
+                                </p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End call-to-action Area -->
+
+    <!-- Start testomial Area -->
+    <section class="testomial-area section-gap">
+        <div class="container">
+            <div class="row d-flex justify-content-center">
+                <div class="menu-content pb-60 col-lg-8">
+                    <div class="title text-center">
+                        <h1 class="mb-10">What our Reader’s Say about us</h1>
+                        <p>Who are in extremely love with novels.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="active-tstimonial-carusel">
+                    <div class="single-testimonial item">
+                        <img class="mx-auto" src="{% static 'img/t1.png' %}" alt>
+                        <p class="desc">
+                            Readify is my go-to online bookstore! The curated selection is diverse, 
+                            and the stylish presentation of each book adds an extra touch.
+                            The seamless shopping experience and quick delivery make it a delight for any book lover.
+                        </p>
+                        <h4>Mark Alviro</h4>
+                        <p>
+                            Captain of Creativity
+                        </p>
+                    </div>
+                    <div class="single-testimonial item">
+                        <img class="mx-auto" src="{% static 'img/t2.png' %}" alt>
+                        <p class="desc">
+                            I'm consistently impressed with Readify's commitment to quality and variety. The unique genre names and stylish recommendations showcase a thoughtful curation process. It's not just a bookstore;
+                             it's a literary haven with a touch of class
+                        </p>
+                        <h4>Mark Antony</h4>
+                        <p>
+                            Quantum Ventures
+                        </p>
+                    </div>
+                    <div class="single-testimonial item">
+                        <img class="mx-auto" src="{% static 'img/t3.png' %}" alt>
+                        <p class="desc">
+                            Readify has turned book buying into an experience. The chic variety of genres and the captivating book covers make browsing a joy. 
+                            It's the perfect blend of style and substance for any avid reader.
+                        </p>
+                        <h4>Mark Paul</h4>
+                        <p>
+                            Nebula Nexus
+                        </p>
+                    </div>
+                    <div class="single-testimonial item">
+                        <img class="mx-auto" src="{% static 'img/t1.png' %}" alt>
+                        <p class="desc">
+                            The moment I entered Readify, I felt like I stepped into a literary boutique. The cleverly named genres and the visually appealing website make it a standout.
+                             It's not just a bookstore; it's a destination for book enthusiasts who appreciate a touch of elegance
+                        </p>
+                        <h4>Alen walker</h4>
+                        <p>
+                            Orion Dynamics
+                        </p>
+                    </div>
+                    <div class="single-testimonial item">
+                        <img class="mx-auto" src="{% static 'img/t2.png' %}" alt>
+                        <p class="desc">
+                            Readify has transformed my reading experience. The carefully chosen featured books and the chic presentation make it a true gem in the online book world.
+                             It's more than a store; it's a literary retreat
+                        </p>
+                        <h4>Savio Joes</h4>
+                        <p>
+                            Astro Apex
+                        </p>
+                    </div>
+                    <div class="single-testimonial item">
+                        <img class="mx-auto" src="{% static 'img/t3.png' %}" alt>
+                        <p class="desc">
+                            Accessories Here you can find the best computer
+                            accessory for your laptop, monitor, printer,
+                            scanner, speaker, projector, hardware and more.
+                            laptop accessory
+                        </p>
+                        <h4>Mark Alviro Wiens</h4>
+                        <p>
+                            CEO at Google
+                        </p>
+                    </div>
+                    <div class="single-testimonial item">
+                        <img class="mx-auto" src="{% static 'img/t1.png' %}" alt>
+                        <p class="desc">
+                            Accessories Here you can find the best computer
+                            accessory for your laptop, monitor, printer,
+                            scanner, speaker, projector, hardware and more.
+                            laptop accessory
+                        </p>
+                        <h4>Mark Alviro Wiens</h4>
+                        <p>
+                            CEO at Google
+                        </p>
+                    </div>
+                    <div class="single-testimonial item">
+                        <img class="mx-auto" src="{% static 'img/t2.png' %}" alt>
+                        <p class="desc">
+                            Accessories Here you can find the best computer
+                            accessory for your laptop, monitor, printer,
+                            scanner, speaker, projector, hardware and more.
+                            laptop accessory
+                        </p>
+                        <h4>Mark Alviro Wiens</h4>
+                        <p>
+                            CEO at Google
+                        </p>
+                    </div>
+                    <div class="single-testimonial item">
+                        <img class="mx-auto" src="{% static 'img/t3.png' %}" alt>
+                        <p class="desc">
+                            Accessories Here you can find the best computer
+                            accessory for your laptop, monitor, printer,
+                            scanner, speaker, projector, hardware and more.
+                            laptop accessory
+                        </p>
+                        <h4>Mark Alviro Wiens</h4>
+                        <p>
+                            CEO at Google
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End testomial Area -->
+
+    <!-- start footer Area -->
+    <footer class="footer-area section-gap">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 col-md-6 col-sm-6">
+                    <div class="single-footer-widget">
+                        <h6>About Us</h6>
+                        <p>
+                            Our online bookstore is a haven for those who seek not only captivating reads but also a blend of style and substance. We pride ourselves on meticulously selecting books that transcend genres, turning every page into a chic adventure.
+                            Join us on a literary journey where books become more than possessions; they become statements of refined taste. 
+        
+                        </p>
+                        <p class="footer-text">
+                            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                            Copyright &copy;
+                            <script>document.write(new Date().getFullYear());</script>
+                            All rights reserved | This side  is made with
+                            <i class="fa fa-heart-o" aria-hidden="true"></i>
+                            for<a href="https://colorlib.com" target="_blank">Book Lovers</a>
+                            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-5  col-md-6 col-sm-6">
+                    <div class="single-footer-widget">
+                        <h6>Newsletter</h6>
+                        <p>Stay update with our latest</p>
+                        <div class id="mc_embed_signup">
+                            <form target="_blank" novalidate="true"
+                                action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01"
+                                method="get" class="form-inline">
+                                <input class="form-control" name="EMAIL" placeholder="Enter Email"
+                                    onfocus="this.placeholder = ''" onblur="this.placeholder = 'Enter Email '" required
+                                    type="email">
+                                <button class="click-btn btn btn-default"><i class="fa fa-long-arrow-right"
+                                        aria-hidden="true"></i></button>
+                                <div style="position: absolute; left: -5000px;">
+                                    <input name="b_36c4fd991d266f23781ded980_aefe40901a" tabindex="-1" value
+                                        type="text">
+                                </div>
+
+                                <div class="info"></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-6 social-widget">
+                    <div class="single-footer-widget">
+                        <h6>Follow Us</h6>
+                        <p>Let us be social</p>
+                        <div class="footer-social d-flex align-items-center">
+                            <a href="#"><i class="fa fa-facebook"></i></a>
+                            <a href="#"><i class="fa fa-twitter"></i></a>
+                            <a href="#"><i class="fa fa-dribbble"></i></a>
+                            <a href="#"><i class="fa fa-behance"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- End footer Area -->
+
+
+    <script src="{% static 'js/vendor/jquery-2.2.4.min.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="{% static 'js/vendor/bootstrap.min.js' %}"></script>
+    <script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhOdIF3Y9382fqJYt5I_sswSrEw5eihAA"></script>
+    <script src="{% static 'js/easing.min.js' %}"></script>
+    <script src="{% static 'js/hoverIntent.js' %}"></script>
+    <script src="{% static 'js/superfish.min.js' %}"></script>
+    <script src="{% static 'js/jquery.ajaxchimp.min.js' %}"></script>
+    <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'js/jquery.sticky.js' %}"></script>
+    <script src="{% static 'js/jquery.nice-select.min.js' %}"></script>
+    <script src="{% static 'js/parallax.min.js' %}"></script>
+    <script src="{% static 'js/waypoints.min.js' %}"></script>
+    <script src="{% static 'js/jquery.counterup.min.js' %}"></script>
+    <script src="{% static 'js/mail-script.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+        integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+        integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
+

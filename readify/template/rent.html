@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .custom-h1 {
+        margin-top: 100px;
+        margin-left: 90px;
+        color: black;
+    }
+
+    .container1 {
+        border: 5px outset 
+        /* Border with solid style and blue color */
+    
+        /* Border style set to outset */
+    }
+
+    /* Input container */
+    .input-container {
+        position: relative;
+        margin: 20px;
+    }
+
+    /* Input field */
+    .input-field {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: none;
+        border-bottom: 2px solid #ccc;
+        outline: none;
+        background-color: transparent;
+    }
+
+    /* Input label */
+    .input-label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 16px;
+        color: rgba(204, 204, 204, 0);
+        pointer-events: none;
+        transition: all 0.3s ease;
+    }
+
+    /* Input highlight */
+    .input-highlight {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 2px;
+        width: 0;
+        background-color: #007bff;
+        transition: all 0.3s ease;
+    }
+
+    /* Input field:focus styles */
+    .input-field:focus+.input-label {
+        top: -20px;
+        font-size: 12px;
+        color: #007bff;
+    }
+
+    .input-field:focus+.input-label+.input-highlight {
+        width: 100%;
+    }
+
+    .alert-top {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 500px;
+        /* Adjust this width as needed */
+        z-index: 1000;
+        /* Ensure the alert is on top of other content */
+    }
+</style>
+
+
+<body>
+    <br><br>
+    <h1 class="text custom-h1">Rent a Book</h2>
+        <br><br>
+        <div class="container container1">
+
+            <form class="rentform" method="post" action="">
+                {% csrf_token %}
+                <div class="rent">
+                    <div class="form-group">
+                        <div class="media">
+
+                            <div class="media-body mt-4">
+                                <h5 style="text-align: center;">
+                                    {{rent.title}}
+                                </h5>
+                            </div>
+                            <img src="{{rent.picture.url}}" alt="Product Image" class="mr-3 mt-3" style="width: 72px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+
+                        <div class="input-container">
+                            <input placeholder="Enter Rental Duration (15 per days):" name="duration" id="duration"
+                                class="input-field" type="number" max="35">
+                            <label for="input-field" class="input-label">Enter Rental Duration (15 per days)::</label>
+                            <span class="input-highlight"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <div class="input-container">
+                            <input placeholder="Total Amount " name="total" id="tot" class="input-field" type="number"
+                                readonly>
+                            <label for="input-field" class="input-label">Total Amount</label>
+                            <span class="input-highlight"></span>
+                        </div>
+
+                    </div>
+
+
+                    <button type="submit" id="sweet-alert-button"
+                        class="btn btn-outline-success btn-block">Request</button>
+                </div>
+            </form>
+            <br><br>
+        </div>
+        <br><br><br>
+        <script>
+            // Calculate total amount based on rental duration
+            document.getElementById("duration").addEventListener('input', function () {
+                var duration = parseInt(this.value);
+                var rate = 15; // Rate per day
+                var totalAmount = duration * rate;
+                document.getElementById("tot").value = totalAmount.toFixed(2);
+                console.log(totalAmount);
+            });
+
+            // Validate rental duration input
+            document.getElementById("durationInput").addEventListener('change', function () {
+                var duration = parseInt(this.value);
+                if (isNaN(duration) || duration < 1 || duration > 35) {
+                    alert("Please enter a valid rental duration between 1 and 15 days.");
+                    this.value = ''; // Clear invalid input
+                }
+            });
+        </script>
+
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const urlParams = new URLSearchParams(window.location.search);
+                const alertType = urlParams.get('alert');
+
+                if (alertType === 'invalid_credentials') {
+                    showAlert('Invalid login Captcha', 'danger');
+                } else if (alertType === 'book_limit_exceeded') {
+                    const bookId = urlParams.get('book_id');
+                    showAlert(`You can only rent up to 3 books at a time. Book ID: ${bookId}`, 'danger');
+                }
+
+
+                function showAlert(message, alertType) {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.classList.add('alert', `alert-${alertType}`, 'alert-top'); // Properly concatenate the class name
+                    alertDiv.textContent = message;
+
+                    const container = document.querySelector('.container1'); // Assuming you want to insert the alert into 'container1'
+                    container.insertBefore(alertDiv, container.firstChild);
+
+                    setTimeout(function () {
+                        alertDiv.remove();
+                    }, 5000); // Remove after 5 seconds
+                }
+            });
+        </script>
+        {% endblock content %}
+
+</body>
+
+</html>

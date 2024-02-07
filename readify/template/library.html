@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+    <style>
+        .custom-sidebar {
+            height: 700px;
+            margin-top: 55px;
+            background-image: -webkit-linear-gradient(90deg, #f45622 0%, #f53e54 100%);
+        }
+
+        .custom-heading {
+            margin-top: 80px;
+        }
+
+        .image-container {
+            width: fit-content;
+            height: fit-content;
+        }
+
+        .image-container img {
+            width: 180px;
+            height: 280px;
+        }
+
+
+
+
+        .cardb {
+            width: 450px;
+            height: 200px;
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .cardb:hover {
+            transform: scale(1.05);
+        }
+
+        .cardb .card-info {
+            background-color: #2E86DE;
+            /* Background color */
+            color: #fff;
+            /* Text color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 0.7rem;
+            transition: background-color 0.3s;
+        }
+
+        .cardb:hover .card-info {
+            background-color: #E74C3C;
+            /* New background color on hover */
+        }
+
+        .cardb .title {
+            font-weight: bold;
+            letter-spacing: 0.1em;
+        }
+
+        .card1,
+        .card2 {
+            display: flex;
+            gap: 150px;
+            margin-left: 30px;
+            margin-top: 20px;
+        }
+
+
+
+        #btn_goto {
+            width: 5em;
+            height: 2em;
+            border-radius: 30em;
+            font-size: 15px;
+            font-family: inherit;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            margin-left: 185px;
+            margin-right: 50px;
+            margin-top: 125px;
+
+        }
+
+        #btn_goto::before {
+            content: '';
+            width: 0;
+            height: 2em;
+            border-radius: 5em;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-image: linear-gradient(to right, #0fd850 0%, #f9f047 100%);
+            transition: .5s ease;
+            display: block;
+            z-index: -1;
+        }
+
+        #btn_goto:hover::before {
+            width: 5em;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2  d-md-block sidebar  custom-sidebar">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active mt-2 " href="#" id="dashboard-link">
+                                <h2 class="text-light">Library</h2>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-light" href="#" id="books-link">
+                                Ordered Books
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-light" href="#" id="audio-link">
+                                Audio Books
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-light" href="#" id="e-book-link">
+                                E-Books
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <h1 class="custom-heading">Readify</h1>
+                <!-- {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-danger text-center">{{ message }}</div>
+                {% endfor %}
+                {% endif %} -->
+                <!-- Dashboard Content -->
+                <div class="my-4" id="dashboard-content">
+                    <!-- Display Dashboard content here -->
+                    <div class="card1">
+                        <div class="cardb">
+                            <div class="card-info">
+                                <h3 class="title" style="color: white;">
+                                    <center>ordered books</center>
+                                </h3>
+                                <a href="#" id="books-link1"><button id="btn_goto"> <i
+                                            class="bi bi-arrow-right-circle"></i></button></a>
+                            </div>
+                        </div>
+                        <div class="cardb">
+                            <div class="card-info">
+                                <h3 class="title" style="color: white;">
+                                    <center>Audio books</center>
+                                </h3>
+                                <a href="#" id="audio-link1"><button id="btn_goto"> <i
+                                            class="bi bi-arrow-right-circle"></i></button></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card2">
+                        <div class="cardb">
+                            <div class="card-info">
+                                <h3 class="title" style="color: white;">
+                                    <center>E books</center>
+                                </h3>
+                                <a href="#" id="e-book-link1"><button id="btn_goto"><i
+                                            class="bi bi-arrow-right-circle"></i></button></a>
+                            </div>
+                        </div>
+                        <!-- <div class="cardb">
+                        <div class="card-info">
+                            <h3 class="title" style="color: white;"><center>Audio books</center></h3>
+                            <button id="btn_goto"> <i class="bi bi-arrow-right-circle"></i></button>
+                        </div>
+                    </div> -->
+                    </div>
+
+                </div>
+
+                <!-- Add Book Form -->
+                <div class="my-4" id="books-content" style="display: none;">
+                    <h2>Book</h2>
+                    <!-- Your add book form code goes here -->
+
+                </div>
+
+                <!-- ... Your previous HTML code ... -->
+
+                <div class="my-4" id="audio-content" style="display: none;">
+                    <h2>Audiobook</h2>
+
+                    <div class="container mt-5">
+                        <div class="row">
+                            {% for i in libaryaudio %}
+                            <div class="col-md-3">
+                                <div class="card image-container">
+                                    <img src="{{ i.cover_image.url }}" class="card-img-top ml-3 mt-2" alt="Book Image">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ i.title }}</h5>
+                                        <audio id="audio{{ forloop.counter }}" src="{{ i.audio_file.url }}"></audio>
+                                        <div class="d-flex justify-content-between">
+                                            <button class="btn btn-outline-success w-50"
+                                                onclick="playAudio('audio{{ forloop.counter }}')"><i
+                                                    class="bi bi-play-circle-fill"></i></button>
+                                            <button class="btn btn-outline-danger w-50 ml-1"
+                                                onclick="pauseAudio('audio{{ forloop.counter }}')"><i
+                                                    class="bi bi-pause-circle-fill"></i></button>
+                                        </div>
+                                        <br>
+                                        <a href="{% url 'delete_audiolibrary' i.id %}" class="btn btn-danger  w-100 "onclick=" return confirmDelete();"><i
+                                                class="fas fa-trash-alt"></i>
+                                            Remove</a>
+                                        </a>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="my-4" id="ebook-content" style="display: none;">
+                    <h2>E-Book</h2>
+
+
+                    <div class="container mt-5">
+                        <div class="row">
+                            {% for i in libarypdf %}
+                            <div class="col-md-3">
+                                <div class="card image-container">
+
+                                    <img src="{{ i.cover_image.url }}" class="card-img-top ml-3 mt-2" alt="Book Image">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ i.book_name }}</h5>
+
+                                        <div class="d-flex flex-column justify-content-between">
+                                            <a href="{{ i.pdf_file.url }}" download
+                                                class="btn btn-outline-info  w-100 "><i class="bi bi-download"></i>
+                                                Download PDF</a>
+                                            </a>
+                                            <br>
+                                            <a href="{% url 'delete_pdflibrary' i.id %}" class="btn btn-danger w-100" onclick="return confirmDelete();">
+                                                <i class="fas fa-trash-alt"></i> Remove
+                                            </a>
+                                        </div>
+
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+
+        </div>
+
+        </main>
+    </div>
+    </div>
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+    <script>
+
+        function confirmDelete() {
+            return confirm("Are you sure you want to delete this item?");
+        }
+        // JavaScript Functions for Audio Control
+        function playAudio(audioId) {
+            var audio = document.getElementById(audioId);
+            audio.play();
+        }
+
+        function pauseAudio(audioId) {
+            var audio = document.getElementById(audioId);
+            audio.pause();
+        }
+
+        // JavaScript to handle menu item clicks and content display
+        $(document).ready(function () {
+            $("#dashboard-link").click(function () {
+                $("#dashboard-content").show();
+                $("#books-content").hide();
+                $("#audio-content").hide();
+                $("#ebook-content").hide();
+            });
+
+            $("#books-link").click(function () {
+                $("#dashboard-content").hide();
+                $("#books-content").show();
+                $("#audio-content").hide();
+                $("#ebook-content").hide();
+            });
+
+            $("#books-link1").click(function () {
+                $("#dashboard-content").hide();
+                $("#books-content").show();
+                $("#audio-content").hide();
+                $("#ebook-content").hide();
+            });
+
+            $("#audio-link").click(function () {
+                $("#dashboard-content").hide();
+                $("#books-content").hide();
+                $("#audio-content").show();
+                $("#ebook-content").hide();
+            });
+
+            $("#audio-link1").click(function () {
+                $("#dashboard-content").hide();
+                $("#books-content").hide();
+                $("#audio-content").show();
+                $("#ebook-content").hide();
+            });
+
+            $("#e-book-link").click(function () {
+                $("#dashboard-content").hide();
+                $("#books-content").hide();
+                $("#audio-content").hide();
+                $("#ebook-content").show();
+            });
+
+            $("#e-book-link1").click(function () {
+                $("#dashboard-content").hide();
+                $("#books-content").hide();
+                $("#audio-content").hide();
+                $("#ebook-content").show();
+            });
+        });
+    </script>
+{% endblock content %}
+</body>
+
+</html>

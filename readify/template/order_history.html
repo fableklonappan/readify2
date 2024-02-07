@@ -1,0 +1,255 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Mobile Specific Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Favicon-->
+    <link rel="shortcut icon" href="{% static 'img/fav.png' %}">
+    <!-- Author Meta -->
+    <meta name="author" content="codepixer">
+    <!-- Meta Description -->
+    <meta name="description" content>
+    <!-- Meta Keyword -->
+    <meta name="keywords" content>
+    <!-- meta character set -->
+    <meta charset="UTF-8">
+    <!-- Site Title -->
+    <title>Book</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,400,300,500,600,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
+        integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e" crossorigin="anonymous">
+    <!--
+        CSS
+        ============================================= -->
+    <link rel="stylesheet" href="{% static 'css/linearicons.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
+    <link rel="stylesheet" href="{% static 'css/nice-select.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/owl.carousel.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<style>
+    .img-thumbnail {
+        width: 50px;
+        height: 60px;
+    }
+
+    .customSize {
+
+        font-size: 18px;
+        margin: 10px;
+    }
+
+    .customPosition {
+        position: absolute;
+        top: -5px;
+        right: 75px;
+        background-color: red;
+
+        border-radius: 40px;
+        font-size: 2px;
+    }
+
+    .customPosition1 {
+        position: absolute;
+        top: -5px;
+        right: 10px;
+        background-color: rgb(137, 137, 222);
+
+        border-radius: 40px;
+        font-size: 2px;
+    }
+</style>
+
+<!-- ... Your HTML code ... -->
+
+<body>
+
+    <header id="header" class="bg-dark" id="home">
+        <div class="container">
+            <div class="row align-items-center justify-content-between d-flex">
+                <div id="logo">
+                    <a href="{% url 'index' %}"><img src="{% static 'img/logo.png' %}" height="30px" width="100px" alt title /></a>
+                </div>
+                <nav id="nav-menu-container">
+                    <ul class="nav-menu">
+                        <li class="menu-active"><a href="{% url 'index' %}">Home</a></li>
+                        {% if user.is_authenticated %}
+                        <li><a href="#about">About</a></li>
+                        <li><a href="{% url 'libary_view' %}">library</a></li>
+                        <li class="menu-has-children"><a href>Order</a>
+                            <ul>
+                                <li><a href="{% url 'order_history' %}">Order</a></li>
+                                
+                            </ul>
+                        <li class="menu-has-children"><a href>Books</a>
+                            <ul>
+                                <li><a id="printcopy" href="{% url 'books_view' %}">Print Copy</a></li>
+                                <li><a href="{% url 'audio_view' %}">Audiobook</a></li>
+                                <li><a href="{% url 'pdf_view' %}">E-Books</a></li>
+                            </ul>
+                        </li>
+                        {% endif %}
+                        <li class="menu-has-children"><a href><i id="log-drop"
+                                    class="bi bi-person-gear customSize mr-3"></i>{{user.first_name}}
+                                {{user.last_name}}</a>
+                            <ul>
+                                {% if user.is_authenticated %}
+                                <li><a href="{% url 'profile' %}">profile</a></li>
+                                <li><a href="{% url 'logout' %}">logout</a></li>
+                                {% endif %}
+                                {% if not user.is_authenticated %}
+                                <li><a href="{% url 'login' %}">Login</a></li>
+                                <li><a href="{% url 'register' %}">Register Customer</a></li>
+                                <li><a href="{% url 'seller' %}">Register Seller</a></li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'cart' %}"><i class="bi bi-cart3 customSize text-light fs-5"></i></a>
+                        </li>
+                        <li><a href="{% url 'wishlist' %}"><i class="bi bi-heart customSize text-light"></i></a>
+                        </li>
+
+                        <li><a class="customPosition1" href="{% url 'wishlist' %}">{{countw}}</a></li>
+                        <li><a class="customPosition" href="{% url 'cart' %}">{{count}}</a></li>
+
+                        {% endif %}
+                    </ul>
+                </nav><!-- #nav-menu-container -->
+            </div>
+        </div>
+    </header><!-- #header -->
+
+    <div class="container mt-5 p-5">
+        <h2 class=" mt-5">Order History</h2>
+
+        <!-- Table to display order history -->
+        <table class="table" id="order-table">
+            <thead>
+                <tr>
+                    <th scope="col">Image</th>
+                    <th scope="col">Book Title</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Stock Total</th>
+                    <th scope="col">Purchase Date</th>
+                    <th scope="col">Actions</th> <!-- Added column for actions -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for history in order_history %}
+                <tr>
+                    <td>
+                        <!-- Placeholder image (replace with actual book image URL) -->
+                        <img src="{{ history.book.picture.url }}" alt="Book Image" class="img-thumbnail">
+                    </td>
+                    <td>{{ history.book.title }}<br><br></td>
+                    <td>{{ history.quantity }}<br><br></td>
+                    <td>₹{{ history.stock_total|floatformat:2 }}<br><br></td>
+                    <td>{{ history.purchase_date|date:"F d, Y H:i" }}</td>
+                    <td>
+                        <!-- View button with Bootstrap styling -->
+                        <a class="btn btn-outline-success mt-4" href="{% url 'print_as_pdf' history.id %}">
+                            <i class="bi bi-file-pdf-fill" style="font-size: 1rem; color: rgb(238, 50, 8);"></i></i>
+                            Print Invoice
+                        </a>
+                    </td>
+                </tr>
+                
+                {% endfor %}
+            </tbody>
+          
+        </table>
+        <hr>
+
+    </div>
+
+    <!-- Include Bootstrap JS (and Popper.js for Bootstrap 4) -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <script>
+        // JavaScript logic to merge rows with the same purchase date vertically
+        document.addEventListener("DOMContentLoaded", function () {
+            const table = document.getElementById('order-table');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+            let currentPurchaseDate = null;
+            let mergedRow = null;
+
+            for (let i = 0; i < rows.length; i++) {
+                const purchaseDateCell = rows[i].getElementsByTagName('td')[4]; // Assuming purchase date is in the 5th column
+
+                if (purchaseDateCell.textContent === currentPurchaseDate) {
+                    // Merge rows vertically
+                    mergedRow.cells[0].innerHTML += '<br><img src="' + rows[i].getElementsByTagName('td')[0].querySelector('img').src + '" alt="Book Image" class="img-thumbnail">';
+                    mergedRow.cells[1].innerHTML += '<br>' + rows[i].getElementsByTagName('td')[1].innerHTML;
+                    mergedRow.cells[2].innerHTML += '<br>' + rows[i].getElementsByTagName('td')[2].innerHTML;
+                    mergedRow.cells[3].innerHTML += '<br>' + rows[i].getElementsByTagName('td')[3].innerHTML;
+                    rows[i].parentNode.removeChild(rows[i]); // Remove the merged row
+
+                    // Update the purchase date for the next iteration
+                    currentPurchaseDate = purchaseDateCell.textContent;
+                } else {
+                    // Not the same purchase date, update the variables
+                    currentPurchaseDate = purchaseDateCell.textContent;
+                    mergedRow = rows[i];
+                }
+            }
+        });
+    </script>
+
+
+
+    <!-- start footer Area -->
+
+    <!-- End footer Area -->
+
+
+    <script src="{% static 'js/vendor/jquery-2.2.4.min.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="{% static 'js/vendor/bootstrap.min.js' %}"></script>
+    <script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBhOdIF3Y9382fqJYt5I_sswSrEw5eihAA"></script>
+    <script src="{% static 'js/easing.min.js' %}"></script>
+    <script src="{% static 'js/hoverIntent.js' %}"></script>
+    <script src="{% static 'js/superfish.min.js' %}"></script>
+    <script src="{% static 'js/jquery.ajaxchimp.min.js' %}"></script>
+    <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'js/jquery.sticky.js' %}"></script>
+    <script src="{% static 'js/jquery.nice-select.min.js' %}"></script>
+    <script src="{% static 'js/parallax.min.js' %}"></script>
+    <script src="{% static 'js/waypoints.min.js' %}"></script>
+    <script src="{% static 'js/jquery.counterup.min.js' %}"></script>
+    <script src="{% static 'js/mail-script.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+        integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+        integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+</body>
+
+<!-- ... Your HTML code ... -->
+
+
+</html>
