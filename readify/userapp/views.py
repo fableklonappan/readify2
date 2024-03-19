@@ -1,3 +1,4 @@
+from datetime import datetime, date
 from django.shortcuts import render, redirect
 from django.contrib import auth
 from django.shortcuts import render, redirect
@@ -7,20 +8,46 @@ from django.shortcuts import render, redirect
 from django.contrib import messages, auth
 
 # In userapp/views.py
-from libraryapp.models import BookCart, Wishlist
+from libraryapp.models import BookCart, Wishlist, planSubscription
 from .models import UserProfile,CustomUser
 # from accounts.backends import EmailBackend
 from django.contrib.auth import get_user_model
 
-
+from django.core.exceptions import ObjectDoesNotExist
 User = get_user_model()
 
+
+from datetime import datetime
 
 def index(request):
     user_id = request.user.id
     books_in_count = BookCart.objects.filter(user_id=user_id).count()
     books_in_countw = Wishlist.objects.filter(user_id=user_id).count()
-    return render(request, "index.html" ,{'count':books_in_count,'countw':books_in_countw})
+    current_date = datetime.now().date()
+    luffy = 2
+    try:
+        # Fetch the latest subscription ordered by start date
+        sub = planSubscription.objects.order_by('-startdate').first()
+        if sub:
+            luffy= 3
+            if sub.payment_status == 'successful':
+                if sub.status == 'Active':
+                # Check if the subscription is active
+                    if sub.enddate.date() > current_date:
+                        luffy = 4
+    except ObjectDoesNotExist:
+        # Handle the case where no subscription exists
+        sub = None
+    print(luffy)  # Debugging print statement
+    context = {
+        'count': books_in_count,
+        'countw': books_in_countw,
+        'sub': sub,
+        'luffy': luffy
+    }
+    return render(request, "index.html", context=context)
+
+
 
 
 
@@ -42,6 +69,10 @@ def login(request):
                         error_message = "Inactive login credentials."
                         return render(request, 'login.html', {'error_message': error_message})
                 else:
+                    if user.is_superuser==1:
+                        auth_login(request,user)
+                        print(user.role)
+                        return redirect('http://127.0.0.1:8000/publisherapp/pubindex/')
                     if user.role==1:
                         auth_login(request,user)
                         print(user.role)

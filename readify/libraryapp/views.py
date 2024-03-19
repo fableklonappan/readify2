@@ -1,4 +1,6 @@
 import datetime
+from django.utils import timezone
+from time import timezone
 from django.shortcuts import render
 from django.urls import reverse
 import razorpay
@@ -8,7 +10,7 @@ from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.contrib import messages
 from urllib import request
 from django.shortcuts import get_object_or_404, redirect, render
-from .models import AddBook,BookCart, RentalRequest,Wishlist,AudioBook,PdfBook,LibraryAudio,LibraryPdf,On_payment,BookCategory, paymenthistory
+from .models import AddBook,BookCart, RentalRequest,Wishlist,AudioBook,PdfBook,LibraryAudio,LibraryPdf,On_payment,BookCategory, paymenthistory,Subscription, planSubscription
 from django.db.models import Q
 from django.http import JsonResponse
 from xhtml2pdf import pisa
@@ -27,9 +29,32 @@ def books_view(request):
     bookdata = AddBook.objects.all()
     categories = BookCategory.objects.all()
     user_id = request.user.id
+    lockcart = BookCart.objects.filter(user_id=user_id)
+    lockwish = Wishlist.objects.filter(user_id=user_id)
+    wishlist_ids = [item.book.id for item in lockwish]
+    print(wishlist_ids)
+    # for book_id in lock_wishlist_ids:
+    #     print(book_id)
+    for book in lockwish:
+        print(book.book_id)
+
+
+
     books_in_count = BookCart.objects.filter(user_id=user_id).count()
     books_in_countw = Wishlist.objects.filter(user_id=user_id).count()
-    return render(request,'books.html',{'bookdata': bookdata , 'count':books_in_count,'countw':books_in_countw,'categories': categories})
+    latest_subscription = planSubscription.objects.order_by('-startdate').first()
+    # if  latest_subscription
+    context ={
+        'bookdata': bookdata ,
+        'count':books_in_count,
+        'countw':books_in_countw,
+        'categories': categories,
+        'latest_subscription':latest_subscription,
+        'lockcart':lockcart,
+        'lockwish':lockwish,
+        'wishlist_ids':wishlist_ids,
+    }
+    return render(request,'books.html', context= context)
 
 @login_required(login_url='http://127.0.0.1:8000/login/')
 def books_view_category(request,category):
@@ -481,7 +506,7 @@ def rent(request, rentid):
         total_books_rented = RentalRequest.objects.filter(user=user, request_status=RentalRequest.PaymentStatusChoices.SUCCESSFUL).count()
         if total_books_rented >= 3:
             # return HttpResponseForbidden("You can only rent up to 3 books at a time.")
-            return HttpResponseRedirect(reverse('rent', args=[rentid]) + '?alert=book_limit_exceeded&book_id=' + str(rentid))
+            return HttpResponseRedirect(reverse('rent', args=[rentid]) + '?alert=book_limit_exceeded&book_id=')
 
         duration = int(request.POST.get('duration', 0))  # Convert to integer
         total = calculate_total(duration)
@@ -501,7 +526,7 @@ def rent(request, rentid):
     return render(request, "rent.html", {'rent': rent_details})
 
 def calculate_total(duration):
-    rate_per_day = 15  # Assuming the rate is $15 per day
+    rate_per_day = 5  # Assuming the rate is $15 per day
     total = duration * rate_per_day
     return total
 
@@ -552,7 +577,7 @@ def renthandler(request):
 
 
 def Rentpayment(request, idpass):
-    rent_item = RentalRequest.objects.filter(user=request.user, id=idpass).first()
+    rent_item = RentalRequest.objects.get(user=request.user, id=idpass)
     if rent_item:
         amount = rent_item.total*100
         currency = 'INR'
@@ -567,8 +592,13 @@ def Rentpayment(request, idpass):
     # order id of newly created order.
     razorpay_order_id = razorpay_order['id']
     callback_url = '/libraryapp/renthandler/'
-
+    # wishlist_item, created = Wishlist.objects.get_or_create(user=request.user, book=bookid)
+    
+    # if not created:
+    #     wishlist_item.quantity += 1
+    #     wishlist_item.save()
     if rent_item:
+        rent_item.request_status = RentalRequest.PaymentStatusChoices.PAYMENT_PROCESSING
         rent_item.razorpay_order_id = razorpay_order_id
         rent_item.save()
     # Add the products to the order
@@ -588,13 +618,116 @@ def Rentpayment(request, idpass):
     }
     return render(request, 'payment.html', context=context)
 
+def view_rent(request):
+   user= request.user
+   rent_data=RentalRequest.objects.filter(user=user)
+   return render(request, 'rent_view.html',{'rent_data':rent_data})
+
+
+def subscription(request):
+    plans = Subscription.objects.all()
+    subscription = Subscription.objects.values().first()
+    if subscription:
+        features_str = subscription['features']  # Get the 'features' field as a string
+        features = features_str.split(',') if features_str else []
+    else:
+        features = []
+    return render(request, 'subscription.html',{'plans':plans,'features': features})
 
 
 
+@csrf_exempt
+def subscriptionhandler(request):
+    # Only accept POST request.
+    if request.method == "POST":
+        # Get the required parameters from the post request.
+        payment_id = request.POST.get('razorpay_payment_id', '')
+        razorpay_order_id = request.POST.get('razorpay_order_id', '')
+        signature = request.POST.get('razorpay_signature', '')
+        params_dict = {
+            'razorpay_order_id': razorpay_order_id,
+            'razorpay_payment_id': payment_id,
+            'razorpay_signature': signature
+        }
+
+        # Verify the payment signature.
+        result = razorpay_client.utility.verify_payment_signature(params_dict)
+        if result is not None:
+            payment = planSubscription.objects.get(razorpay_order_id=razorpay_order_id)
+            amount = int(payment.price * 100)  # Use the total attribute instead of amount
+            # Capture the payment.
+            razorpay_client.payment.capture(payment_id, amount)
+
+            # Update the request_status to indicate successful payment.
+            
+            payment.payment_status = planSubscription.PaymentStatusChoices.SUCCESSFUL
+            payment.status =  planSubscription.StatusChoices.ACTIVE
+            payment.save()
+
+            payment.datechanger()
+
+            return render(request, 'success.html')
+        else:
+            # If there is an error while capturing payment.
+            return render(request, 'paymentfail.html')
+    else:
+        # If signature verification fails.
+        return HttpResponseBadRequest()
+
+ 
+def subscriptionpayement(request , plan):
+    plan_item = Subscription.objects.get (id=plan)
+    currency = 'INR'
+    amount = plan_item.price*100
+     
+    # Create a Razorpay Order
+    razorpay_order = razorpay_client.order.create(dict(amount=amount, currency=currency, payment_capture='0'))
+  
+    # order id of newly created order.
+    razorpay_order_id = razorpay_order['id']
+    callback_url = '/libraryapp/subhandler/'
+   
+    item = planSubscription.objects.create(
+        user = request.user,
+        price=amount / 100,
+        subid = plan_item,
+        payment_status = planSubscription.PaymentStatusChoices.PAYMENT_PROCESSING,
+        razorpay_order_id = razorpay_order_id,
+        )
+    item.save()
+    # Add the products to the order
+    
+
+    # Save the order to generate an order ID
+    
+ 
+    # we need to pass these details to frontend.
+    context = {
+        ''
+        'razorpay_order_id': razorpay_order_id,
+        'razorpay_merchant_key': settings.RAZOR_KEY_ID,
+        'razorpay_amount': amount,  # Set to 'total_price'
+        'currency': currency,
+        'callback_url': callback_url,
+    }
+    return render(request, 'payment.html', context=context)
 
 
 
+def wallet(request):
+     total_price = request.GET.get('totalPrice')
+
+     if total_price is not None:
+        # Do something with the total_price
+        print("Total price:", total_price)
+        # For example, you can pass it to a template as context
+        return render(request, 'payment.html', {'total_price': total_price})
+     else:
+        # Handle the case when the 'totalPrice' parameter is not provided
+        return HttpResponse("Total price not provided.")
+        return render(request, 'Wallet.html')
 
 
-
-
+def addwallet(request):
+    
+    return render(request ,'wallet')

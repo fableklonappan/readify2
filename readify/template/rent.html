@@ -105,9 +105,9 @@
                     <div class="form-group">
 
                         <div class="input-container">
-                            <input placeholder="Enter Rental Duration (15 per days):" name="duration" id="duration"
-                                class="input-field" type="number" max="35">
-                            <label for="input-field" class="input-label">Enter Rental Duration (15 per days)::</label>
+                            <input placeholder="Enter Rental Duration (5 per week):" name="duration" id="duration"
+                                class="input-field" type="number" max="4">
+                            <label for="input-field" class="input-label">Enter Rental Duration (5 per week):</label>
                             <span class="input-highlight"></span>
                         </div>
 
@@ -136,7 +136,7 @@
             // Calculate total amount based on rental duration
             document.getElementById("duration").addEventListener('input', function () {
                 var duration = parseInt(this.value);
-                var rate = 15; // Rate per day
+                var rate = 5; // Rate per day
                 var totalAmount = duration * rate;
                 document.getElementById("tot").value = totalAmount.toFixed(2);
                 console.log(totalAmount);
@@ -162,7 +162,7 @@
                     showAlert('Invalid login Captcha', 'danger');
                 } else if (alertType === 'book_limit_exceeded') {
                     const bookId = urlParams.get('book_id');
-                    showAlert(`You can only rent up to 3 books at a time. Book ID: ${bookId}`, 'danger');
+                    showAlert(`You can only rent up to 3 books at a time.`, 'danger');
                 }
 
 

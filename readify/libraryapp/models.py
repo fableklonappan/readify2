@@ -3,6 +3,7 @@ from django.forms import ValidationError
 from userapp.models import CustomUser
 from decimal import Decimal
 from django.utils import timezone
+from datetime import timedelta
 # Create your models here.
 
 class BookCategory(models.Model):
@@ -141,6 +142,7 @@ class LibraryPdf(models.Model):
 class RentalRequest(models.Model):
     class PaymentStatusChoices(models.TextChoices):
         PENDING = 'pending', 'Pending'
+        PAYMENT_PROCESSING = 'payment processing' ,'PAYMENT PROCESSING'
         SUCCESSFUL = 'successful', 'Successful'
         FAILED = 'failed', 'Failed'
 
@@ -152,6 +154,80 @@ class RentalRequest(models.Model):
     razorpay_order_id = models.CharField(max_length=255, null=True)
     request_status = models.CharField(
         max_length=20, choices=PaymentStatusChoices.choices, default=PaymentStatusChoices.PENDING)
+
+    def __str__(self):
+        return f"rent history for {self.user.first_name} - {self.book.title}"
+
+class Subscription(models.Model):
+    class nameplanStatusChoices(models.TextChoices):
+        GOLD = 'Gold','GOLD'
+        Premium ='premium','PREMIUM'
+    nameplan =  models.CharField(max_length=255 , choices=nameplanStatusChoices.choices )
+    date = models.DateTimeField(auto_now_add=True)
+    price = models.PositiveIntegerField(null=True, blank=True)
+    duration = models.PositiveIntegerField()  # Duration in months
+    features = models.CharField(max_length=255 , default='',) 
+
+    
+
+
+    def __str__(self):
+        return f"{self.nameplan}'s Subscription"
+    
+
+class planSubscription(models.Model):
+    class PaymentStatusChoices(models.TextChoices):
+        PENDING = 'pending', 'Pending'
+        PAYMENT_PROCESSING = 'payment processing' ,'PAYMENT PROCESSING'
+        SUCCESSFUL = 'successful', 'Successful'
+        FAILED = 'failed', 'Failed'
+    class StatusChoices(models.TextChoices):
+        EXPIRED = 'expired' ,'EXPIRED'
+        ACTIVE = 'active' , 'ACTIVE'
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
+    subid=models.ForeignKey(Subscription,on_delete=models.CASCADE,null=True)
+    price =models.PositiveIntegerField(null=True, blank=True)
+    startdate = models.DateTimeField(auto_now_add=True)
+    enddate = models.DateTimeField(null=True)
+    razorpay_order_id = models.CharField(max_length=255, null=True) 
+    status = models.CharField(
+        max_length=20, choices=StatusChoices.choices, default=StatusChoices.EXPIRED)
+    payment_status = models.CharField(
+        max_length=20, choices=PaymentStatusChoices.choices, default=PaymentStatusChoices.PENDING)
+    
+    def save(self, *args, **kwargs):
+        current_date = timezone.now()
+        if self.enddate and current_date.date() > self.enddate.date():
+            self.status = "Expired"
+        else:
+            self.status = "Active"
+        super().save(*args, **kwargs)
+
+    def datechanger(self):
+        if self.subid and self.subid.duration and self.startdate:
+            self.enddate = self.startdate + timedelta(days=30 * self.subid.duration)
+            self.save()
+
+    def __str__(self):
+        return f"Subscription plan for {self.user.first_name} - {self.subid.nameplan}"
+    
+
+class wallet(models.Model):
+    class PaymentStatusChoices(models.TextChoices):
+        PENDING = 'pending', 'Pending'
+        PAYMENT_PROCESSING = 'payment processing' ,'PAYMENT PROCESSING'
+        SUCCESSFUL = 'successful', 'Successful'
+        FAILED = 'failed', 'Failed'
+
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
+    book = models.ForeignKey(AddBook, on_delete=models.CASCADE, null=True)
+    duration = models.PositiveIntegerField()
+    total = models.PositiveIntegerField(null=True, blank=True)
+    order_date = models.DateTimeField(auto_now_add=True)
+    razorpay_order_id = models.CharField(max_length=255, null=True)
+    request_status = models.CharField(
+        max_length=20, choices=PaymentStatusChoices.choices, default=PaymentStatusChoices.PENDING)
+    
 
     def __str__(self):
         return f"rent history for {self.user.first_name} - {self.book.title}"

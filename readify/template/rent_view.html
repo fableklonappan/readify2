@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .image-container {
+        width: 100px;
+        height: 90px;
+    }
+
+    .image-container img {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    .custom-h1 {
+        margin-top: 100px;
+        margin-left: 90px;
+        color: black;
+    }
+
+    .custom-margin {
+        margin-top: 100px;
+        margin-left: 90px;
+        color: black;
+    }
+</style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text  custom-h1">Rental Requests</h1>
+        <br>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Book</th>
+                    <th>Duration</th>
+                    <th>Total</th>
+                    <th>Order Date</th>
+                    <th>Status</th>
+                    <th>Image</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in rent_data %}
+                <tr>
+
+                    <td>{{data.book.title}}</td>
+                    <td>{{data.duration}}</td>
+                    <td>{{data.total}}</td>
+                    <td>{{data.order_date}}</td>
+                    <td>
+                        {% if data.request_status == "successful" %}
+
+                        <span class="badge badge-success mt-3">
+                            {{ data.request_status }}</span>
+                        {% elif data.request_status == "payment processing" %}
+
+                        <span class="badge badge-warning mt-3">{{ data.request_status }}</span>
+
+                        {% else %}
+
+                        <span class="badge badge-danger mt-3">{{ data.request_status }}</span>
+
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="image-container">
+                            <img src="{{data.book.picture.url}}" alt="Book Image" class="img-thumbnail">
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+    {% endblock content %}
+</body>
+
+</html>

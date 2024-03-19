@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .container1 {
+        max-width: 800px;
+        margin: 30px auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .wallet-balance {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .transaction-history {
+        border-top: 2px solid #ddd;
+        margin-top: 20px;
+        padding-top: 20px;
+    }
+
+    .transaction {
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .transaction span {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .amount {
+        display: block;
+        font-weight: bold;
+    }
+
+    .positive {
+        color: green;
+    }
+
+    .negative {
+        color: red;
+    }
+
+    .custom {
+        margin-right: 430px;
+    }
+</style>
+</head>
+
+<body>
+    <br>
+    <div class="container1 mt-5">
+        <h2 class="text-center mt-5 mb-4">Wallet Balance</h2>
+        <div class="text-center mb-4">
+            <h3 class="wallet-balance">$500.00</h3>
+        </div>
+
+        <!-- <h2 class="text-center mb-4">Add Amount</h2> -->
+
+        <div class="d-flex justify-content-center">
+            <div class="container w-75 input-group">
+                <input type="number" id="amount" class="form-control" placeholder="Enter amount" oninput="checkInput()">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-success " type="button" id="addButton" disabled>Add</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-center mt-3 mr-3 ">
+            <h7 class=" d-flex justify-content-center ">Recommended: </h7>
+            <button class="btn btn-outline-success btn-add-amount btn-sm mr-3" onclick="addAmount(500)">₹500</button>
+            <button class="btn btn-outline-success btn-add-amount btn-sm mr-3" onclick="addAmount(1000)">₹ 1000</button>
+            <button class="btn btn-outline-success btn-add-amount btn-sm" onclick="addAmount(2000)">₹ 2000</button>
+        </div>
+
+        <h2 class="text-center mt-4">Transaction History</h2>
+        <div class="transaction-history">
+            <div class="transaction">
+                <span>Transaction ID: 123456</span>
+                <span>Date: January 20, 2024</span>
+                <span class="amount positive">Amount: +$100.00</span>
+            </div>
+            <div class="transaction">
+                <span>Transaction ID: 654321</span>
+                <span>Date: January 15, 2024</span>
+                <span class="amount negative">Amount: -$50.00</span>
+            </div>
+            <div class="transaction">
+                <span>Transaction ID: 654321</span>
+                <span>Date: January 15, 2024</span>
+                <span class="amount negative">Amount: -$50.00</span>
+            </div>
+            <!-- More transactions here -->
+        </div>
+    </div>
+
+    <script>
+        function addAmount(amount) {
+            document.getElementById('amount').value = amount;
+            checkInput();
+        }
+        function checkInput() {
+            var input = document.getElementById('amount').value;
+            if (input == '') {
+                document.getElementById('addButton').disabled = true;
+            } else {
+                document.getElementById('addButton').disabled = false;
+            }
+        }
+
+        $(document).ready(function () {
+            $("#addButton").on("click", function () {
+                // Get the value from the input field
+                var totalPrice = $("#amount").val();
+
+                // Construct the URL with the total price as a query parameter
+                var url = "{% url 'addwallet'%}?totalPrice=" + encodeURIComponent(totalPrice);
+
+                // Redirect to the constructed URL
+                window.location.href = url;
+            });
+        });
+
+
+
+    </script>
+
+
+    {% endblock content %}
+</body>
+
+</html>

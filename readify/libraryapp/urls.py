@@ -30,5 +30,11 @@ urlpatterns = [
      path('print_as_pdf/<int:stid2>/', views.print_as_pdf, name='print_as_pdf'),
      path('rent/<int:rentid>/', views.rent, name='rent'),
      path('Rentpayment/<int:idpass>/', views.Rentpayment, name='rentpayment'),
-      path('renthandler/', views.renthandler, name='renthandler'),
+     path('renthandler/', views.renthandler, name='renthandler'),
+     path('view_rent/', views.view_rent, name='view_rent'),
+     path('subscription/', views.subscription, name='subscription'),
+     path('subscriptionpayement/<int:plan>/', views.subscriptionpayement, name='subscriptionpayement'),
+     path('subscriptionhandler/', views.subscriptionhandler, name='subscriptionhandler'),
+     path('wallet/', views.wallet, name='wallet'),
+      path('addwallet/', views.addwallet, name='addwallet'),
 ]

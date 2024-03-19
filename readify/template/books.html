@@ -194,12 +194,38 @@
               <a href="{% url 'add_cart' data.id %}"><button class="btn btn-outline-info w-25 ml-50 mt-10">
                   <i class="bi bi-cart-plus pr-3"></i>Add to Cart
                 </button></a>
-              <a href="{% url 'add_wishlist' data.id %}"><button class="btn btn-outline-danger ml-50 w-25 mt-10">
+              {% if data.id in wishlist_ids %}
+              <a href="{% url 'add_wishlist' data.id %}">
+                <button class="btn btn-outline-danger ml-50 w-25 mt-10" disabled title="Already in Wishlist">
+                  <i class="bi bi-suit-heart-fill pr-3"></i>Already in Wishlist
+                </button>
+              </a>
+              {% else %}
+              <a href="{% url 'add_wishlist' data.id %}">
+                <button class="btn btn-outline-danger ml-50 w-25 mt-10">
                   <i class="bi bi-suit-heart-fill pr-3"></i>Add to Wishlist
-                </button></a>
-              <a href="{% url 'rent' data.id %}"><button class="btn btn-outline-secondary ml-50 w-25 mt-10">
+                </button>
+              </a>
+              {% endif %}
+
+
+
+              {% if latest_subscription.status == 'Active' %}
+              <a href="{% url 'rent' data.id %}">
+                <button class="btn btn-outline-secondary ml-50 w-25 mt-10">
                   <i class="bi bi-book pr-3"></i>Rent the book
-                </button></a>
+                </button>
+              </a>
+              {% else %}
+              <a href="{% url 'rent' data.id %}">
+                <button class="btn btn-outline-secondary ml-50 w-25 mt-10" disabled title="Only for subscribe Customer">
+                  <i class="bi bi-lock-fill pr-3"></i>Rent the book
+                </button>
+              </a>
+              {% endif %}
+
+
+
             </div>
           </div>
         </div>
