@@ -151,7 +151,6 @@ class RentalRequest(models.Model):
     duration = models.PositiveIntegerField()
     total = models.PositiveIntegerField(null=True, blank=True)
     order_date = models.DateTimeField(auto_now_add=True)
-    razorpay_order_id = models.CharField(max_length=255, null=True)
     request_status = models.CharField(
         max_length=20, choices=PaymentStatusChoices.choices, default=PaymentStatusChoices.PENDING)
 
@@ -212,7 +211,7 @@ class planSubscription(models.Model):
         return f"Subscription plan for {self.user.first_name} - {self.subid.nameplan}"
     
 
-class wallet(models.Model):
+class walletdata(models.Model):
     class PaymentStatusChoices(models.TextChoices):
         PENDING = 'pending', 'Pending'
         PAYMENT_PROCESSING = 'payment processing' ,'PAYMENT PROCESSING'
@@ -220,14 +219,22 @@ class wallet(models.Model):
         FAILED = 'failed', 'Failed'
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
-    book = models.ForeignKey(AddBook, on_delete=models.CASCADE, null=True)
-    duration = models.PositiveIntegerField()
-    total = models.PositiveIntegerField(null=True, blank=True)
+    total = models.PositiveIntegerField(null=True, blank=True, default=0)
     order_date = models.DateTimeField(auto_now_add=True)
     razorpay_order_id = models.CharField(max_length=255, null=True)
     request_status = models.CharField(
         max_length=20, choices=PaymentStatusChoices.choices, default=PaymentStatusChoices.PENDING)
     
 
+
     def __str__(self):
-        return f"rent history for {self.user.first_name} - {self.book.title}"
+        return f"rent history for {self.user.first_name} - {self.request_status}"
+
+
+class copywalletdata(models.Model):  # Capitalize Model
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
+    total = models.PositiveIntegerField(null=True, blank=True, default=0)
+    purchase_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user}'s --- {self.total}"

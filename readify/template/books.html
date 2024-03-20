@@ -167,11 +167,22 @@
 
     {% csrf_token %}
     {% for data in bookdata %}
-    {% if messages %}
-    {% for message in messages %}
-    <div class="alert alert-danger text-center">{{ message }}</div>
-    {% endfor %}
-    {% endif %}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <!-- Check if there are messages and display them using SweetAlert -->
+            {% if messages %}
+            <script>
+                {% for message in messages %}
+                Swal.fire({
+                    icon: '{{ message.tags }}',
+                    title: '{{ message.tags }}',
+                    text: '{{ message }}',
+                    timer: 5000, // Auto close after 3 seconds
+                    showConfirmButton: false,
+                    footer: '<a href="{% url 'wishlist' %}">View Wishlist</a>'
+                });
+                {% endfor %}
+            </script>
+            {% endif %}
     <div class="container mt-1">
       <div class="row">
         <div class="col-md-12 mb-2">

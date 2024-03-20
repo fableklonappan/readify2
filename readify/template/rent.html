@@ -10,10 +10,10 @@
     }
 
     .container1 {
-        border: 5px outset 
-        /* Border with solid style and blue color */
-    
-        /* Border style set to outset */
+        border: 5px outset
+            /* Border with solid style and blue color */
+
+            /* Border style set to outset */
     }
 
     /* Input container */
@@ -83,6 +83,8 @@
 
 <body>
     <br><br>
+
+
     <h1 class="text custom-h1">Rent a Book</h2>
         <br><br>
         <div class="container container1">
@@ -130,6 +132,21 @@
                 </div>
             </form>
             <br><br>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <!-- Check if there are messages and display them using SweetAlert -->
+            {% if messages %}
+            <script>
+                {% for message in messages %}
+                Swal.fire({
+                    icon: '{{ message.tags }}',
+                    title: '{{ message.tags }}',
+                    text: '{{ message }}',
+                    timer: 3000, // Auto close after 3 seconds
+                    showConfirmButton: false
+                });
+                {% endfor %}
+            </script>
+            {% endif %}
         </div>
         <br><br><br>
         <script>

@@ -35,9 +35,10 @@
     <link rel="stylesheet" href="{% static 'css/owl.carousel.css' %}">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
 
-
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
 </head>
 <style>
     .customSize {
@@ -69,9 +70,15 @@
     body {
         background-color:beige;
     }
+    /* .alanBtn-root
+    {
+        margin-right: 80px;
+        
+    } */
 </style>
 
 <body>
+    <div class="alan-btn"></div>
     <script type="text/javascript">
         (function (d, m) {
             var kommunicateSettings =
@@ -83,6 +90,32 @@
         })(document, window.kommunicate || {});
         /* NOTE : Use web server to view HTML files as real-time update will not work if you directly open the HTML file in the browser. */
     </script>
+
+<script src="https://studio.alan.app/web/lib/alan_lib.min.js"></script>
+<script type="text/javascript"
+ src="https://studio.alan.app/web/lib/alan_lib.min.js"></script>
+<script>
+  var alanBtnInstance = alanBtn({
+    key: "115389f46b2eab9e46af2a0ed3c888da2e956eca572e1d8b807a3e2338fdd0dc/stage",
+    onCommand: function (commandData) {
+      if (commandData.command === "wishlist") {
+        window.location.href = "http://127.0.0.1:8000/libraryapp/wishlist";
+      }else if (commandData.command === "cart") {
+            window.location.href = "http://127.0.0.1:8000/libraryapp/cart";
+        } else if (commandData.command === "wallet") {
+            window.location.href = "http://127.0.0.1:8000/libraryapp/wallet/";
+        } else if (commandData.command === "book") {
+            window.location.href = "http://127.0.0.1:8000/libraryapp/books_view/";  
+        } else if (commandData.command === "library") {
+            window.location.href = "http://127.0.0.1:8000/libraryapp/library_view/";
+        }else if (commandData.command === "home") {
+            window.location.href = "http://127.0.0.1:8000/";
+        }
+      
+    },
+    rootEl: document.getElementById("alan-btn"),
+  });
+</script>
     <header id="header" class="bg-dark" id="home">
         <div class="container">
             <div class="row align-items-center justify-content-between d-flex">
@@ -108,7 +141,7 @@
                                 <li><a href="{% url 'pdf_view' %}">E-Books</a></li>
                             </ul>
                         </li>
-                        <li><a href="{% url 'wallet' %}"> Wallet <i class="bi bi-wallet  mr-3"></i> </a></li>   
+                        <li><a href="{% url 'wallet' %}"> Wallet  <i class="bi bi-wallet  mr-3"></i> </a></li>   
                         {% endif %}
                         <li class="menu-has-children"><a href><i id="log-drop"
                                     class="bi bi-person-gear customSize mr-3"></i>{{user.first_name}}
@@ -141,7 +174,7 @@
         </div>
     </header><!-- #header -->
     
-
+   
 
     {% block content %}
 

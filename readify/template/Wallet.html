@@ -59,7 +59,7 @@
     <div class="container1 mt-5">
         <h2 class="text-center mt-5 mb-4">Wallet Balance</h2>
         <div class="text-center mb-4">
-            <h3 class="wallet-balance">$500.00</h3>
+            <h3 class="wallet-balance">₹{{data.total}}</h3>
         </div>
 
         <!-- <h2 class="text-center mb-4">Add Amount</h2> -->
@@ -80,25 +80,42 @@
             <button class="btn btn-outline-success btn-add-amount btn-sm" onclick="addAmount(2000)">₹ 2000</button>
         </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Check if there are messages and display them using SweetAlert -->
+    {% if messages %}
+        <script>
+            {% for message in messages %}
+                Swal.fire({
+                    icon: '{{ message.tags }}',
+                    title: '{{ message.tags }}',
+                    text: '{{ message }}',
+                    timer: 3000, // Auto close after 3 seconds
+                    showConfirmButton: false
+                });
+            {% endfor %}
+        </script>
+    {% endif %}
+
+
         <h2 class="text-center mt-4">Transaction History</h2>
         <div class="transaction-history">
             <div class="transaction">
                 <span>Transaction ID: 123456</span>
                 <span>Date: January 20, 2024</span>
-                <span class="amount positive">Amount: +$100.00</span>
+                <span class="amount positive">Amount: +₹100.00</span>
             </div>
             <div class="transaction">
                 <span>Transaction ID: 654321</span>
                 <span>Date: January 15, 2024</span>
-                <span class="amount negative">Amount: -$50.00</span>
+                <span class="amount negative">Amount: -₹50.00</span>
             </div>
             <div class="transaction">
                 <span>Transaction ID: 654321</span>
                 <span>Date: January 15, 2024</span>
-                <span class="amount negative">Amount: -$50.00</span>
+                <span class="amount negative">Amount: -₹50.00</span>
             </div>
-            <!-- More transactions here -->
-        </div>
+        <!-- More transactions here -->
+    </div>
     </div>
 
     <script>
@@ -121,7 +138,7 @@
                 var totalPrice = $("#amount").val();
 
                 // Construct the URL with the total price as a query parameter
-                var url = "{% url 'addwallet'%}?totalPrice=" + encodeURIComponent(totalPrice);
+                var url = "{% url 'addwallet' %}?totalPrice=" + encodeURIComponent(totalPrice);
 
                 // Redirect to the constructed URL
                 window.location.href = url;

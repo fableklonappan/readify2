@@ -10,7 +10,9 @@ from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.contrib import messages
 from urllib import request
 from django.shortcuts import get_object_or_404, redirect, render
-from .models import AddBook,BookCart, RentalRequest,Wishlist,AudioBook,PdfBook,LibraryAudio,LibraryPdf,On_payment,BookCategory, paymenthistory,Subscription, planSubscription
+
+from userapp.models import CustomUser
+from .models import AddBook,BookCart, RentalRequest,Wishlist,AudioBook,PdfBook,LibraryAudio,LibraryPdf,On_payment,BookCategory, copywalletdata, paymenthistory,Subscription, planSubscription, walletdata
 from django.db.models import Q
 from django.http import JsonResponse
 from xhtml2pdf import pisa
@@ -19,6 +21,7 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from collections import defaultdict
 from django.contrib.auth.decorators import login_required
+from django.db.models import Exists, OuterRef
 
 razorpay_client = razorpay.Client(
     auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
@@ -186,18 +189,28 @@ def add_wishlist(request, bookid3):
     if not created:
         wishlist_item.quantity += 1
         wishlist_item.save()
-
+    messages.success(request, f'{bookid.title} Added to Wishlist')
     return redirect('books_view')
 
 @login_required(login_url='http://127.0.0.1:8000/login/')
 def wishlist(request):
     user_id = request.user.id
-    books_in_cart = Wishlist.objects.filter(user_id=user_id)
+    wish = Wishlist.objects.filter(user_id=user_id)
+    cart= BookCart.objects.filter(user_id=user_id)
     books_in_count = BookCart.objects.filter(user_id=user_id).count()
     books_in_countw = Wishlist.objects.filter(user_id=user_id).count()
-    book_details = AddBook.objects.filter(id__in=books_in_cart.values_list('book_id', flat=True))
+    book_details = AddBook.objects.filter(id__in=wish.values_list('book_id', flat=True)).annotate(
+        in_cart=Exists(cart.filter(book_id=OuterRef('id')))
+    )
+    print(book_details )
+    context= {
+        'wish':wish,
+        'books':book_details,
+        'count':books_in_count,
+        'countw':books_in_countw
 
-    return render(request,"wishlist.html",{'books':book_details,'count':books_in_count,'countw':books_in_countw})
+    }
+    return render(request,"wishlist.html", context)
 
 @login_required(login_url='http://127.0.0.1:8000/login/')
 def delete_wishlist(request, bye):
@@ -226,6 +239,7 @@ def audio_view(request):
 @login_required(login_url='http://127.0.0.1:8000/login/')
 def live_search_audio(request):
     query = request.GET.get('query')
+
     if query:
         books = AudioBook.objects.filter(Q(id__icontains=query) | Q(title__icontains=query))
     else:
@@ -503,24 +517,24 @@ def rent(request, rentid):
     if request.method == 'POST':
         # Check if the user has already rented 3 books
         user = request.user
-        total_books_rented = RentalRequest.objects.filter(user=user, request_status=RentalRequest.PaymentStatusChoices.SUCCESSFUL).count()
-        if total_books_rented >= 3:
-            # return HttpResponseForbidden("You can only rent up to 3 books at a time.")
-            return HttpResponseRedirect(reverse('rent', args=[rentid]) + '?alert=book_limit_exceeded&book_id=')
+        total= RentalRequest.objects.filter(user=user, request_status=RentalRequest.PaymentStatusChoices.SUCCESSFUL).count()
 
-        duration = int(request.POST.get('duration', 0))  # Convert to integer
-        total = calculate_total(duration)
-        rental_request = RentalRequest(
+        print(total)
+        if total >= 3:
+            # return HttpResponseForbidden("You can only rent up to 3 books at a time.")
+            messages.error(request, 'You can only rent up to 3 books at a time.')
+            
+        else:
+            duration = int(request.POST.get('duration', 0))  # Convert to integer
+            total = calculate_total(duration)
+            rental_request = RentalRequest(
             user=user,
             book=rent_details,
             duration=duration,
             total=total,
-        )
-        rental_request.save()
-        # Increment the total_books_rented after saving the current rental request
-        # user.total_books_rented = total_books_rented + 1
-        # user.save()
-        return redirect('rentpayment',idpass=rental_request.id)
+            )
+            rental_request.save()
+            return redirect('rentwallet',idpass=rental_request.id)
         # Redirect or return a response as needed
 
     return render(request, "rent.html", {'rent': rent_details})
@@ -531,92 +545,35 @@ def calculate_total(duration):
     return total
 
 
-@csrf_exempt
-def renthandler(request):
-    # Only accept POST request.
-    if request.method == "POST":
-        # Get the required parameters from the post request.
-        payment_id = request.POST.get('razorpay_payment_id', '')
-        razorpay_order_id = request.POST.get('razorpay_order_id', '')
-        signature = request.POST.get('razorpay_signature', '')
-        params_dict = {
-            'razorpay_order_id': razorpay_order_id,
-            'razorpay_payment_id': payment_id,
-            'razorpay_signature': signature
-        }
+def rentwallet(request, idpass):
+    user = request.user
+    data = copywalletdata.objects.get(user=user)
+    sub = RentalRequest.objects.get(user=user, id=idpass)
+    
+    if sub.book.price <= data.total:  # Use <= for affordability check
+        data.total -= sub.total
 
-        # Verify the payment signature.
-        result = razorpay_client.utility.verify_payment_signature(params_dict)
-        if result is not None:
-            payment = RentalRequest.objects.get(razorpay_order_id=razorpay_order_id)
-            amount = int(payment.total * 100)  # Use the total attribute instead of amount
+        data.save()
+        sub.request_status = RentalRequest.PaymentStatusChoices.SUCCESSFUL
+        sub.save()
 
-            # Capture the payment.
-            razorpay_client.payment.capture(payment_id, amount)
+        # Increment the count of books rented by the user
+        user = request.user
+        total_books_rented = RentalRequest.objects.filter(user=user, request_status=RentalRequest.PaymentStatusChoices.SUCCESSFUL).count()
+        user.total_books_rented = total_books_rented + 1
 
-            # Update the request_status to indicate successful payment.
-            payment.request_status = RentalRequest.PaymentStatusChoices.SUCCESSFUL
-            payment.save()
-
-            user = request.user
-            total_books_rented = RentalRequest.objects.filter(user=user, request_status=RentalRequest.PaymentStatusChoices.SUCCESSFUL).count()
-            user.total_books_rented = total_books_rented + 1
-            user.save()
-            
-
-
-            return render(request, 'success.html')
-        else:
-            # If there is an error while capturing payment.
-            return render(request, 'paymentfail.html')
+        user.save()
+        print(user.total_books_rented)
+        # Add a success message
+        messages.success(request, 'Funds deducted successfully. Your new balance is: ' + str(data.total))
     else:
-        # If signature verification fails.
-        return HttpResponseBadRequest()
+        # Handle case where the book price exceeds the user's wallet balance
+        # You might want to add appropriate error handling or redirect logic here
+        messages.error(request, 'Insufficient funds. Please recharge your wallet.')
+
+    return redirect("wallet")
 
 
-
-
-def Rentpayment(request, idpass):
-    rent_item = RentalRequest.objects.get(user=request.user, id=idpass)
-    if rent_item:
-        amount = rent_item.total*100
-        currency = 'INR'
-    else:
-        # Handle the case when no rental request with the given ID is found
-        # For example, you can redirect the user or render an error page
-        pass
-
-    # Create a Razorpay Order
-    razorpay_order = razorpay_client.order.create(dict(amount=amount, currency=currency, payment_capture='0'))
- 
-    # order id of newly created order.
-    razorpay_order_id = razorpay_order['id']
-    callback_url = '/libraryapp/renthandler/'
-    # wishlist_item, created = Wishlist.objects.get_or_create(user=request.user, book=bookid)
-    
-    # if not created:
-    #     wishlist_item.quantity += 1
-    #     wishlist_item.save()
-    if rent_item:
-        rent_item.request_status = RentalRequest.PaymentStatusChoices.PAYMENT_PROCESSING
-        rent_item.razorpay_order_id = razorpay_order_id
-        rent_item.save()
-    # Add the products to the order
-    
-
-    # Save the order to generate an order ID
-    
- 
-    # we need to pass these details to frontend.
-    context = {
-        ''
-        'razorpay_order_id': razorpay_order_id,
-        'razorpay_merchant_key': settings.RAZOR_KEY_ID,
-        'razorpay_amount': amount,  # Set to 'total_price'
-        'currency': currency,
-        'callback_url': callback_url,
-    }
-    return render(request, 'payment.html', context=context)
 
 def view_rent(request):
    user= request.user
@@ -685,7 +642,7 @@ def subscriptionpayement(request , plan):
   
     # order id of newly created order.
     razorpay_order_id = razorpay_order['id']
-    callback_url = '/libraryapp/subhandler/'
+    callback_url = '/libraryapp/subscriptionhandler/'
    
     item = planSubscription.objects.create(
         user = request.user,
@@ -715,19 +672,104 @@ def subscriptionpayement(request , plan):
 
 
 def wallet(request):
-     total_price = request.GET.get('totalPrice')
+        data = copywalletdata.objects.get(user=request.user)
+        context ={
+            'data' : data,
+        }
+        return render(request, 'Wallet.html' , context= context)
 
-     if total_price is not None:
-        # Do something with the total_price
-        print("Total price:", total_price)
-        # For example, you can pass it to a template as context
-        return render(request, 'payment.html', {'total_price': total_price})
-     else:
-        # Handle the case when the 'totalPrice' parameter is not provided
-        return HttpResponse("Total price not provided.")
-        return render(request, 'Wallet.html')
+@csrf_exempt
+def wallethandler(request):
+    if request.method == "POST":
+           
+            # get the required parameters from post request.
+            payment_id = request.POST.get('razorpay_payment_id', '')
+            razorpay_order_id = request.POST.get('razorpay_order_id', '')
+            signature = request.POST.get('razorpay_signature', '')
+            params_dict = {
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': payment_id,
+                'razorpay_signature': signature
+            }
+ 
+            # verify the payment signature.
+            result = razorpay_client.utility.verify_payment_signature(params_dict)
+            if result is not None:
+                payment = walletdata.objects.get(razorpay_order_id=razorpay_order_id)
+                amount = payment.total *100
+                    # capture the payemt
+                razorpay_client.payment.capture(payment_id, amount)
+
+
+                payment.request_status = walletdata.PaymentStatusChoices.SUCCESSFUL
+                payment.save()
+                cc = payment.total
+                # Assuming 'cc' is the new total value you want to add
+
+# Use get_or_create to get the copywalletdata instance for the user or create it if it doesn't exist
+                copy, created = copywalletdata.objects.get_or_create(
+                user=request.user,
+                defaults={'total': cc}  # Set the default total to 'cc' if creating a new instance
+                )
+                if not created:
+                    copy.total += cc
+                    copy.save()  # Save the updated instance
+
+                    # render success page on successful caputre of payment
+                return render(request, 'success.html')
+            else:
+
+                # if signature verification fails.
+                return render(request, 'paymentfail.html')
+    else:
+       # if other than POST request is made.
+        return HttpResponseBadRequest()
+    
+
 
 
 def addwallet(request):
+    total_price_str = request.GET.get('totalPrice')
+    try:
+        total_price = int(total_price_str)
+    except (ValueError, TypeError):
+        return HttpResponseBadRequest("The amount must be an integer.")
+    currency = 'INR'
+    amount = total_price*100 
+    # Create a Razorpay Order
+    razorpay_order = razorpay_client.order.create(dict(amount=amount, currency=currency, payment_capture='0'))
     
-    return render(request ,'wallet')
+    # order id of newly created order.
+    razorpay_order_id = razorpay_order['id']
+    callback_url = '/libraryapp/wallethandler/'
+    order = walletdata.objects.create(
+        user=request.user,
+        total=amount/100,
+        razorpay_order_id=razorpay_order_id,
+        request_status=walletdata.PaymentStatusChoices.PENDING,
+    )
+    order.save()
+
+    # we need to pass these details to frontend.
+    context = {
+        'amount': amount,
+        'razorpay_order_id': razorpay_order_id,
+        'razorpay_merchant_key': settings.RAZOR_KEY_ID,
+        'razorpay_amount': amount,  # Set to 'total_price'
+        'currency': currency,
+        'callback_url': callback_url,
+    }
+ 
+    return render(request, 'payment.html', context=context)
+
+
+
+
+
+
+
+
+
+
+
+
