@@ -1,0 +1,121 @@
+{% extends "basep.html" %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
+    <style>
+
+      .image-container {
+        width: 100px;
+        height: 90px;
+      }
+
+      .image-container img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+
+       /* Custom styles for DataTable */
+    #rentalTable_wrapper {
+        padding: 20px;
+    }
+
+    #rentalTable_wrapper .dataTables_filter input[type="search"] {
+        width: 300px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        padding: 8px;
+    }
+
+    #rentalTable_wrapper .dataTables_length select {
+        width: 80px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        padding: 8px;
+    }
+
+    #rentalTable th {
+        background-color: #f2f2f2;
+    }
+
+    #rentalTable tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    #rentalTable tbody tr:hover {
+        background-color: #eb7777;
+    }
+    </style>
+  </head>
+
+  <body>
+    
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+          <div class="content">
+            <h1 class="my-4">Rental Requests</h1>
+            <!-- Dashboard content goes here -->
+            <div class="container">
+              <table id="rentalTable" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Book</th>
+                        <th>Duration</th>
+                        <th>Total</th>
+                        <th>Order Date</th>
+                        <th>Status</th>
+                        <th>Image</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Sample data, replace with actual data from your database -->
+                    {% for i in rent_data %}
+                    <tr>
+                        <td>{{i.user.first_name}}</td>
+                        <td>{{ i.book.title }}</td>
+                        <td>{{i.duration}}</td>
+                        <td>{{i.total}}</td>
+                        <td>{{i.order_date}}</td>
+                        {% if i.request_status == "successful" %}
+                        <td>
+                            <span class="badge badge-pill badge-success">{{ i.request_status }}</span>
+                        </td>
+                        {% else %}
+                        <td>
+                            <span class="badge badge-pill badge-danger">{{ i.request_status }}</span>
+                        </td>
+                        {% endif %}
+                        <td>
+                            <div class="image-container">
+                                <img src="{{ i.book.picture.url }}" alt="Book Image" class="img-thumbnail">
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <!-- Add more rows for additional rental requests -->
+                </tbody>
+            </table>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script>
+      $(document).ready(function () {
+          $('#rentalTable').DataTable({
+              "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]], 
+              "pageLength": 4 // Set the number of rows per page to 5
+          });
+      });
+  </script>
+    {% endblock content %}
+  </body>
+</html>

@@ -11,9 +11,9 @@ def logout(request):
 
 def pubindex(request):
     
-    return render(request,'publisher.html')
+    return render(request,'publisher/publisher.html')
 
 def s_rent(request):
     user= request.user
     rent_data=RentalRequest.objects.all()
-    return render(request,'a_rent.html',{'rent_data': rent_data})
+    return render(request,'publisher/rent.html',{'rent_data': rent_data})

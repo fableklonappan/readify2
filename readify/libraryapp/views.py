@@ -45,13 +45,13 @@ def books_view(request):
 
     books_in_count = BookCart.objects.filter(user_id=user_id).count()
     books_in_countw = Wishlist.objects.filter(user_id=user_id).count()
-    latest_subscription = planSubscription.objects.order_by('-startdate').first()
+    latest_subscription = planSubscription.objects.order_by('-startdate').filter(user_id=request.user.id).first()
     # if  latest_subscription
     context ={
         'bookdata': bookdata ,
         'count':books_in_count,
         'countw':books_in_countw,
-        'categories': categories,
+        'categories': categories,   
         'latest_subscription':latest_subscription,
         'lockcart':lockcart,
         'lockwish':lockwish,
@@ -547,30 +547,37 @@ def calculate_total(duration):
 
 def rentwallet(request, idpass):
     user = request.user
-    data = copywalletdata.objects.get(user=user)
+    try:
+        data = copywalletdata.objects.get(user=request.user)
+    except copywalletdata.DoesNotExist:
+        data = None
     sub = RentalRequest.objects.get(user=user, id=idpass)
-    
-    if sub.book.price <= data.total:  # Use <= for affordability check
-        data.total -= sub.total
+    if data:
+        if sub.book.price <= data.total:  # Use <= for affordability check
+            data.total -= sub.total
 
-        data.save()
-        sub.request_status = RentalRequest.PaymentStatusChoices.SUCCESSFUL
-        sub.save()
+            data.save()
+            sub.request_status = RentalRequest.PaymentStatusChoices.SUCCESSFUL
+            sub.save()
 
         # Increment the count of books rented by the user
-        user = request.user
-        total_books_rented = RentalRequest.objects.filter(user=user, request_status=RentalRequest.PaymentStatusChoices.SUCCESSFUL).count()
-        user.total_books_rented = total_books_rented + 1
+            user = request.user
+            total_books_rented = RentalRequest.objects.filter(user=user, request_status=RentalRequest.PaymentStatusChoices.SUCCESSFUL).count()
+            user.total_books_rented = total_books_rented + 1
 
-        user.save()
-        print(user.total_books_rented)
+            user.save()
+            print(user.total_books_rented)
         # Add a success message
-        messages.success(request, 'Funds deducted successfully. Your new balance is: ' + str(data.total))
+            messages.success(request, 'Funds deducted successfully. Your new balance is: ' + str(data.total))
+        else:
+        # Handle case where the book price exceeds the user's wallet balance
+        # You might want to add appropriate error handling or redirect logic here
+            messages.error(request, 'Check your current balance to ensure you have enough funds to cover the transaction or book amount.Please recharge your wallet...')
     else:
         # Handle case where the book price exceeds the user's wallet balance
         # You might want to add appropriate error handling or redirect logic here
-        messages.error(request, 'Insufficient funds. Please recharge your wallet.')
-
+            messages.error(request, 'Insufficient funds. Please recharge your wallet.')
+            
     return redirect("wallet")
 
 
@@ -672,11 +679,15 @@ def subscriptionpayement(request , plan):
 
 
 def wallet(request):
+    try:
         data = copywalletdata.objects.get(user=request.user)
-        context ={
-            'data' : data,
+    except copywalletdata.DoesNotExist:
+        data = None
+    
+    context = {
+        'data': data,
         }
-        return render(request, 'Wallet.html' , context= context)
+    return render(request, 'Wallet.html' , context= context)
 
 @csrf_exempt
 def wallethandler(request):

@@ -27,8 +27,9 @@ def index(request):
     luffy = 2
     try:
         # Fetch the latest subscription ordered by start date
-        sub = planSubscription.objects.order_by('-startdate').first()
-        if sub:
+       sub = planSubscription.objects.order_by('-startdate').filter(user_id=request.user.id).first()
+       print (sub)
+       if sub:
             luffy= 3
             if sub.payment_status == 'successful':
                 if sub.status == 'Active':
@@ -38,7 +39,6 @@ def index(request):
     except ObjectDoesNotExist:
         # Handle the case where no subscription exists
         sub = None
-    print(luffy)  # Debugging print statement
     context = {
         'count': books_in_count,
         'countw': books_in_countw,
