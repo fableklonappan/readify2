@@ -1,0 +1,53 @@
+{% extends "publisher/basep.html" %}
+{% load static %}
+{% block content %}
+
+<main class="container">
+    <div class="card ">
+        <div class="card-header">
+            {% if sub %}
+            <h1 class="card-title text-center"><i class="bi bi-patch-check-fill  text-success p-2"></i>{{user_profile.user.first_name }} Profile Information </h1>
+            {% else %}
+            <h1 class="card-title text-center"><strong>{{user_profile.user.first_name}} Profile Information</strong>
+            </h1>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            {% if user_profile %}
+            <ul class="list-group">
+                <li class="list-group-item"><strong>First Name:</strong> {{ user_profile.user.first_name }}</li>
+                <li class="list-group-item"><strong>Last Name:</strong> {{ user_profile.user.last_name }}</li>
+                <li class="list-group-item"><strong>Email:</strong> {{ user_profile.user.email }}</li>
+                <li class="list-group-item"><strong>Country:</strong> {{ user_profile.country }}</li>
+                <li class="list-group-item"><strong>District:</strong> {{ user_profile.district }}</li>
+                <li class="list-group-item"><strong>Address Line 1:</strong> {{ user_profile.addressline1 }}</li>
+                <li class="list-group-item"><strong>Address Line 2:</strong> {{ user_profile.addressline2 }}</li>
+                <li class="list-group-item"><strong>Phone Number:</strong> {{ user_profile.phone_no }}</li>
+                <li class="list-group-item"><strong>State:</strong> {{ user_profile.state }}</li>
+                <li class="list-group-item"><strong>City:</strong> {{ user_profile.city }}</li>
+                <li class="list-group-item"><strong>Pin Code:</strong> {{ user_profile.4pin_code }}</li>
+                {% else %}
+                <div class="alert alert-warning" role="alert">
+                    wait profile update.
+                </div>
+                {% endif %}
+                {% if rent_data %}
+                <li class="list-group-item"><strong>Total books rented:</strong> {{rent_count}}</li>
+                <li class="list-group-item"><strong> Books rented are:</strong>
+                    {% for item in rent_data %}
+                    {{item.book.title}} ,
+                    {% endfor %}
+                </li>
+                {% else %}
+                <div class="alert alert-warning" role="alert">
+                    This user nothing rented
+                </div>
+                {% endif %}
+
+
+        </div>
+    </div>
+    </div>
+</main>
+
+{% endblock content %}
