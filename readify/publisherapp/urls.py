@@ -10,4 +10,5 @@ urlpatterns = [
     path('view/', views.viewcust, name='viewcust'),
     path('viewid/<int:cusid>', views.detilescust, name='detilescust'),
     path('addbook/', views.addbook, name='addbook'),
+    path('add_audiobook/', views.add_audiobook, name='add_audiobook'),
     ]

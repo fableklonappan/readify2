@@ -2,6 +2,7 @@ from urllib import request
 from django.shortcuts import redirect, render
 from libraryapp.models import AddBook, AudioBook, PdfBook, RentalRequest, paymenthistory, planSubscription
 from publisherapp.models import ViewCustomer
+from publisherapp.form import AddBookForm, AudioBookForm
 from userapp.models import CustomUser, UserProfile
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
@@ -64,4 +65,24 @@ def detilescust(request, cusid):
 
 
 def addbook(request):
+    if request.method == 'POST':
+        form = AddBookForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()  # This will save the form data to the database
+            return redirect('addbook')  # Redirect to a success page or wherever you want
+    else:
+        form = AddBookForm()
+
+    return render(request, 'publisher/addbook.html')
+
+
+def add_audiobook(request):
+    if request.method == 'POST':
+        form = AudioBookForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            # Redirect to a success page or any other URL
+            return redirect('addbook')  # Replace 'success_page' with the URL name of your success page
+    else:
+        form = AudioBookForm()
     return render(request, 'publisher/addbook.html')

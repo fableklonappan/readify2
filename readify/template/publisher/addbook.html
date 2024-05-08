@@ -3,17 +3,135 @@
 {% block content %}
 
 
+<main class="container">
+    <div class="content">
+        <h1 class="text">Enter book</h1>
+        <div class="container mt-4">
+            <button class="mr-4 btn" id="audioBtn">print Details</button>
+            <!-- <button class="mr-4 btn" id="pdfBtn">PDF Details</button> -->
+            <button class="mr-4 btn" id="printBtn">audio Details</button>
+
+            <div class="" id="audioDetails">
+                <!-- Content for audio details -->
+                <form method="post" action="{% url 'addbook' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="picture">Picture:</label>
+                        <input type="file" name="picture" id="picture" class="form-control-file">
+                    </div>
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <input type="text" name="title" id="title" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="author_name">Author Name:</label>
+                        <input type="text" name="author_name" id="author_name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="publisher">Publisher:</label>
+                        <input type="text" name="publisher" id="publisher" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="summary">Summary:</label>
+                        <textarea name="summary" id="summary" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price:</label>
+                        <input type="text" name="price" id="price" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category:</label>
+                        <select name="category" id="category" class="form-control">
+                            <option value="1">Mystery</option>
+                            <option value="2">History</option>
+                            <option value="1">Horror</option>
+                            <option value="2">Romance</option>
+                            <option value="1">Fiction</option>
+                            <option value="2">Fantasy</option>
+                            <!-- Add options for other categories dynamically -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="stock">Stock:</label>
+                        <input type="number" name="stock" id="stock" value="1" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Book</button>
+                </form>
 
 
+            </div>
+
+            <!-- <div id="pdfDetails" style="display: none;"> -->
+                <!-- Content for PDF details -->
+                <!-- <p>This is the PDF details.</p>
+            </div> -->
+
+            <div id="printDetails" style="display: none;">
+                <!-- Content for print details -->
+                <!-- <p>This is the print details.</p> -->
+                <h1>Add AudioBook</h1>
+                <div class="container">
+                    <form method="post" action="{% url 'add_audiobook' %}" enctype="multipart/form-data" class="mt-4" >
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="title">Title:</label>
+                            <input type="text" id="title" name="title" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="author">Author:</label>
+                            <input type="text" id="author" name="author" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="duration">Duration (minutes):</label>
+                            <input type="number" id="duration" name="duration" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="narrator">Narrator:</label>
+                            <input type="text" id="narrator" name="narrator" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="publication_date">Publication Date:</label>
+                            <input type="date" id="publication_date" name="publication_date" class="form-control"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cover_image">Cover Image:</label>
+                            <input type="file" id="cover_image" name="cover_image" class="form-control-file"
+                                accept="image/*" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="audio_file">Audio File:</label>
+                            <input type="file" id="audio_file" name="audio_file" class="form-control-file"
+                                accept="audio/*" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add AudioBook</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#audioBtn').click(function () {
+            $('#audioDetails').show();
+            $('#pdfDetails, #printDetails').hide();
+        });
+
+        $('#pdfBtn').click(function () {
+            $('#pdfDetails').show();
+            $('#audioDetails, #printDetails').hide();
+        });
+
+        $('#printBtn').click(function () {
+            $('#printDetails').show();
+            $('#audioDetails, #pdfDetails').hide();
+        });
+    });
+</script>
 
 
 
 
 {% endblock content %}
-
-
-
-
-
-
-

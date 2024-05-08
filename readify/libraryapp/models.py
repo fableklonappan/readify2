@@ -98,9 +98,9 @@ class Wishlist(models.Model):
 class AudioBook(models.Model):
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=100)
-    duration = models.PositiveIntegerField(help_text="Duration in minutes")
+    duration = models.PositiveIntegerField(help_text="Duration in minutes", null=True, blank=True)
     narrator = models.CharField(max_length=100)
-    publication_date = models.DateField()
+    publication_date = models.DateField(null=True, blank=True)
     cover_image = models.ImageField(upload_to='audiobook_covers/')
     audio_file = models.FileField(upload_to='audiobooks/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
